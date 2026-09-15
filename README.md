@@ -1,10 +1,14 @@
 # Redactiehulp
 
-Hulpmiddel voor redacteuren bij NederlandWereldwijd om webteksten te controleren op schrijfwijzerregels en om een kant-en-klare prompt te bouwen waarmee Claude.ai de tekst (her)schrijft. Zie `strategy.md` voor de achtergrond en `bouwplan.md` (of de sessiegeschiedenis) voor het bouwplan.
+Hulpmiddel voor redacteuren bij NederlandWereldwijd om webteksten te controleren op schrijfwijzerregels en (deels) automatisch te verbeteren. Zie `strategy.md` voor de achtergrond en `bouwplan.md` (of de sessiegeschiedenis) voor het bouwplan.
 
 ## Wat dit is
 
-Eén statische pagina (`index.html`), 100% client-side: geen backend, geen login, geen opslag buiten je eigen browser. Alles draait lokaal totdat je zelf op "kopieer prompt" klikt en die prompt in Claude.ai plakt — dat is nog steeds een bewuste, handmatige stap door de redacteur zelf.
+Eén statische pagina (`index.html`), 100% client-side: geen backend, geen login, geen opslag buiten je eigen browser. De pagina werkt in drie stappen:
+
+1. **Controleer** — regelgebaseerde feedback, geen AI nodig. Zegt bij elk punt of de app het zelf kan oplossen of dat het een redacteur vraagt.
+2. **Verbeteren** — past alleen mechanische correcties toe (leestekens, aanhalingstekens, afgeraden woorden, afkortingen) waar geen taalgevoel voor nodig is. Ook dit blijft volledig in de browser, zonder AI. Je ziet steeds voor en na, en kiest zelf welke verbeteringen worden overgenomen.
+3. **Herschrijven** — nog niet gebouwd. Bedoeld om Claude de tekst te laten herschrijven op stijl en opbouw, met een eigen API-sleutel die alleen in de browser van de gebruiker blijft. Tot die tijd is er een alternatief: een prompt kopiëren naar Claude.ai en het resultaat terugplakken om te vergelijken — dat blijft een bewuste, handmatige stap door de redacteur zelf.
 
 ## Belangrijk: regelset in dit bestand is een placeholder
 
@@ -16,11 +20,17 @@ Voor het echte gebruik is er een losse HTML-versie met de echte regelset, die ni
 
 Open `index.html` gewoon in een browser (dubbelklikken, of via een GitHub Pages-link als die voor de demo is ingeschakeld). Geen installatie nodig.
 
-1. Vul titel, introductie en/of hoofdtekst in.
-2. Klik op "Controleer tekst" voor directe, regelgebaseerde feedback (geen AI nodig).
-3. Klik op "Genereer prompt" om een kant-en-klare prompt te maken; kopieer deze naar Claude.ai.
-4. Plak de AI-output terug bij stap 3 op de pagina om vóór/na te vergelijken.
+1. Plak de hele tekst (titel + introductie + hoofdtekst) in 1 keer in het tekstveld — er is bewust maar 1 invoerveld, geen aparte velden voor titel/introductie.
+2. Klik op "Controleer" voor directe, regelgebaseerde feedback.
+3. Klik op "Verbeter", bekijk de voorstellen, vink af wat je wilt overnemen en klik op "Neem over".
+4. Optioneel (zolang "Herschrijf" nog niet gebouwd is): klap "Alternatief: prompt kopiëren en resultaat terugplakken" open, genereer een prompt, plak die in Claude.ai en plak het antwoord terug om vóór/na te vergelijken.
+
+### Hoe titel/introductie/hoofdtekst worden herkend
+
+`herkenTitelIntroUitTekst()` splitst het ene tekstveld: met labels ("Titel"/"Introductie"/"Hoofdtekst" of "Tekst", elk op een eigen regel) is de indeling expliciet; zonder labels geldt de vuistregel "1e regel = titel, 2e regel = introductie, de rest is hoofdtekst". Die vuistregel hoeft niet perfect te zijn — Controleer wijst vanzelf op een titel die te lang is als de indeling een keer misgaat.
 
 ## Regelset aanpassen
 
-Pas het `RULES`-blok bovenaan het `<script>`-gedeelte van `index.html` aan. Elke regel is een object met `id`, `titel`, `categorie`, `bron`, `scope` (`titel`, `intro` of `tekst`) en een `check(waarde)`-functie die een lijst gevonden aandachtspunten teruggeeft. De rest van de pagina (UI, promptgenerator, vergelijking) hoeft niet aangepast te worden.
+Pas het `RULES`-blok bovenaan het `<script>`-gedeelte van `index.html` aan. Elke regel is een object met `id`, `titel`, `categorie`, `bron`, `scope` (`titel`, `intro` of `tekst`), `autoFixable` (kan de app dit zelf oplossen in stap 2?) en een `check(waarde)`-functie die een lijst gevonden aandachtspunten teruggeeft.
+
+Voor automatische verbeteringen (stap 2) zijn er twee configureerbare lijsten naast `RULES`: `WOORDVERVANGINGEN` (afgeraden woorden/uitdrukkingen met een alternatief) en `AFKORTINGEN` (afkortingen die de eerste keer voluit moeten). Ook `TOEGESTANE_KOP_LABELS` is aan te passen: dat bepaalt welke kop-labels met dubbele punt zijn toegestaan (bijvoorbeeld "Stap 3: ..."). De rest van de pagina (UI, fix-engine, promptgenerator, vergelijking) hoeft niet aangepast te worden.

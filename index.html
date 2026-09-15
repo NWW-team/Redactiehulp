@@ -5,166 +5,253 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Redactiehulp</title>
 <style>
+  /*
+    Kleuren: Rijksoverheid-blauw (#01689B) en de Rijkshuisstijl-foutkleur
+    (#D52B1E) zijn de officiële, overal verplichte kleuren voor
+    Rijksoverheid-sites (waar NederlandWereldwijd er 1 van is) — bevestigd
+    via de officiële documentatie. Het succesgroen is geen bevestigde
+    officiële kleur, maar een toegankelijke, neutrale keuze.
+    Lettertype: het officiële Rijksoverheid-lettertype is licentiegebonden
+    en kan hier niet worden ingeladen; dit is een neutrale systeemfont die
+    er qua karakter op lijkt.
+  */
   :root {
-    --blauw: #154273;
-    --blauw-licht: #e8f0f8;
-    --rand: #d0d7de;
-    --tekst: #1b1f23;
-    --fout: #b42318;
-    --fout-bg: #fef3f2;
+    --blauw: #01689b;
+    --blauw-donker: #154273;
+    --blauw-licht: #e6f0f5;
+    --rand: #d9d9d9;
+    --tekst: #1b1b1b;
+    --fout: #d52b1e;
+    --fout-bg: #fbeae8;
     --ok: #067647;
+    --ok-bg: #e6f4ec;
+    --radius: 2px;
   }
   * { box-sizing: border-box; }
   body {
-    font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 24px 16px 64px;
+    margin: 0;
+    font-family: "Segoe UI", Arial, -apple-system, BlinkMacSystemFont, sans-serif;
     color: var(--tekst);
     background: #fff;
     line-height: 1.5;
   }
-  h1 { font-size: 1.6rem; margin-bottom: 4px; }
-  h2 { font-size: 1.15rem; margin-top: 40px; border-bottom: 2px solid var(--blauw); padding-bottom: 6px; }
+  .kopbalk { background: var(--blauw); color: #fff; }
+  .kopbalk-inner { max-width: 880px; margin: 0 auto; padding: 16px 16px; }
+  .kopbalk h1 { margin: 0; font-size: 1.3rem; font-weight: 700; }
+  .kopbalk .sub { font-size: 0.85rem; opacity: 0.9; margin-top: 2px; }
+  main { max-width: 880px; margin: 0 auto; padding: 20px 16px 56px; }
+  h2 { font-size: 1rem; font-weight: 700; margin: 32px 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--rand); }
+  h2 .stapnummer { color: var(--blauw); margin-right: 4px; }
+  h2 .status { font-weight: 400; font-size: 0.8em; color: #757575; }
   .disclaimer {
-    background: #fff8e1;
-    border: 1px solid #f0c14b;
-    border-radius: 6px;
-    padding: 10px 14px;
-    font-size: 0.9rem;
-    margin: 12px 0 24px;
+    border-left: 3px solid #b8860b;
+    background: #fdf6e5;
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    margin: 14px 0 20px;
   }
-  label { display: block; font-weight: 600; margin: 16px 0 6px; }
-  .hint { font-weight: 400; color: #57606a; font-size: 0.85rem; margin-top: -2px; margin-bottom: 6px; }
+  label { display: block; font-weight: 600; margin: 14px 0 4px; font-size: 0.92rem; }
+  .hint { font-weight: 400; color: #5c5c5c; font-size: 0.8rem; margin-top: -1px; margin-bottom: 5px; }
   input[type=text], textarea, select {
     width: 100%;
     padding: 8px 10px;
     border: 1px solid var(--rand);
-    border-radius: 6px;
+    border-radius: var(--radius);
     font-size: 0.95rem;
     font-family: inherit;
+  }
+  input[type=text]:focus, textarea:focus, select:focus {
+    outline: 2px solid var(--blauw);
+    outline-offset: 1px;
   }
   textarea { resize: vertical; }
   button {
     background: var(--blauw);
     color: #fff;
     border: none;
-    padding: 10px 18px;
-    border-radius: 6px;
-    font-size: 0.95rem;
+    padding: 9px 18px;
+    border-radius: var(--radius);
+    font-size: 0.92rem;
+    font-weight: 600;
     cursor: pointer;
-    margin-top: 12px;
   }
+  button:hover { background: var(--blauw-donker); }
   button.secundair {
     background: #fff;
     color: var(--blauw);
     border: 1px solid var(--blauw);
   }
-  button:hover { opacity: 0.9; }
-  .resultaten { margin-top: 16px; }
+  button.secundair:hover { background: var(--blauw-licht); }
+  button.uit, button.uit:hover { background: #eee; color: #8a8a8a; cursor: not-allowed; border: 1px solid var(--rand); }
+  .knoppenrij { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 12px; }
+  .toelichting { font-size: 0.8rem; color: #5c5c5c; margin-top: 6px; }
+  .resultaten { margin-top: 14px; }
+  .telling { font-size: 0.82rem; color: #5c5c5c; margin-bottom: 8px; }
+  .groepskop { font-weight: 700; margin: 16px 0 6px; font-size: 0.85rem; }
   .issue {
-    background: var(--fout-bg);
-    border: 1px solid #f3aca4;
-    border-radius: 6px;
-    padding: 10px 12px;
-    margin-bottom: 8px;
-    font-size: 0.9rem;
+    background: #fff;
+    border: 1px solid var(--rand);
+    border-left: 4px solid var(--blauw);
+    border-radius: var(--radius);
+    padding: 9px 11px;
+    margin-bottom: 6px;
+    font-size: 0.88rem;
   }
-  .issue .titel { font-weight: 600; color: var(--fout); }
+  .issue.fix-mogelijk { border-left-color: var(--ok); }
+  .issue .titel { font-weight: 700; }
   .issue .fragment { font-style: italic; color: #444; margin-top: 2px; }
-  .issue .bron { color: #6e7781; font-size: 0.8rem; margin-top: 2px; }
+  .issue .bron { color: #757575; font-size: 0.78rem; margin-top: 2px; }
+  .issue .fixlabel { display: inline-block; font-size: 0.72rem; font-weight: 600; padding: 1px 8px; border-radius: 999px; margin-left: 6px; }
+  .issue.fix-mogelijk .fixlabel { background: var(--ok-bg); color: var(--ok); }
+  .issue.fix-niet .fixlabel { background: var(--blauw-licht); color: var(--blauw-donker); }
   .geen-issues {
-    background: #ecfdf3;
-    border: 1px solid #abefc6;
-    color: var(--ok);
-    border-radius: 6px;
-    padding: 10px 12px;
-    font-size: 0.9rem;
+    background: var(--ok-bg);
+    border-left: 4px solid var(--ok);
+    color: #065f39;
+    border-radius: var(--radius);
+    padding: 9px 11px;
+    font-size: 0.88rem;
   }
-  .telling { font-size: 0.85rem; color: #57606a; margin-bottom: 8px; }
-  .vergelijking {
-    display: flex;
-    gap: 16px;
-    margin-top: 12px;
-    flex-wrap: wrap;
-  }
+  .vergelijking { display: flex; gap: 16px; margin-top: 10px; flex-wrap: wrap; }
   .vergelijking > div { flex: 1; min-width: 220px; }
   .badge {
     display: inline-block;
     background: var(--blauw);
     color: #fff;
     border-radius: 999px;
-    padding: 2px 10px;
-    font-size: 0.8rem;
+    padding: 2px 9px;
+    font-size: 0.75rem;
   }
-  footer { margin-top: 48px; font-size: 0.8rem; color: #6e7781; }
+  .voorstel {
+    border: 1px solid var(--rand);
+    border-radius: var(--radius);
+    padding: 9px 11px;
+    margin-bottom: 6px;
+    font-size: 0.88rem;
+    display: flex;
+    gap: 10px;
+  }
+  .voorstel input[type=checkbox] { margin-top: 3px; width: auto; accent-color: var(--blauw); }
+  .voorstel .inhoud { flex: 1; }
+  .voorstel .van { color: var(--fout); text-decoration: line-through; }
+  .voorstel .naar { color: var(--ok); }
+  .voorstel .omschrijving { color: #5c5c5c; font-size: 0.82rem; margin-top: 2px; }
+  .geen-voorstellen {
+    background: #f7f7f7;
+    border-radius: var(--radius);
+    padding: 9px 11px;
+    font-size: 0.88rem;
+    color: #5c5c5c;
+  }
+  details { margin-top: 20px; }
+  summary { cursor: pointer; font-weight: 600; color: var(--blauw); font-size: 0.9rem; }
+  footer { max-width: 880px; margin: 40px auto 0; padding: 0 16px 32px; font-size: 0.78rem; color: #757575; }
 </style>
 </head>
 <body>
 
-<h1>Redactiehulp</h1>
-<p>Hulpmiddel voor redacteuren: controleer een tekst op schrijfwijzerregels en bouw een kant-en-klare prompt om de tekst in Claude.ai te laten (her)schrijven.</p>
+<header class="kopbalk">
+  <div class="kopbalk-inner">
+    <h1>Redactiehulp</h1>
+    <div class="sub">Controleer, verbeter en (straks) herschrijf teksten volgens de schrijfwijzer.</div>
+  </div>
+</header>
 
-<div class="disclaimer">
-  <strong>Let op — demoversie.</strong> Deze pagina bevat een <strong>voorbeeld-/placeholderregelset</strong>, niet de officiële NWW-schrijfwijzer. De regelset (<code>RULES</code>, onderin dit bestand) is bedoeld om de werking te laten zien; vervang hem door de echte regelset voor daadwerkelijk gebruik. Alles in deze pagina werkt volledig in de browser: er wordt niets naar een server verstuurd. Alleen als je zelf op &quot;kopieer prompt&quot; klikt en die in Claude.ai plakt, verlaat de tekst je browser.
+<main>
+
+<div class="disclaimer">Demoversie — placeholder-regelset, niet de officiële NWW-schrijfwijzer. Werkt volledig in je browser.</div>
+
+<h2><span class="stapnummer">1</span>Controleren</h2>
+
+<label for="tekst">Tekst</label>
+<div class="hint">Plak de hele pagina in 1 keer — titel, introductie en hoofdtekst. De app herkent dit zelf (1e regel = titel, 2e regel = introductie, de rest is hoofdtekst). Tussenkop? Begin de regel met <code>##</code>.</div>
+<textarea id="tekst" rows="16" placeholder="Plak of typ hier de hele conceptletekst, inclusief titel en introductie..."></textarea>
+
+<div class="knoppenrij">
+  <button onclick="controleer()">Controleer</button>
 </div>
-
-<h2>1. Tekst invoeren en controleren</h2>
-
-<label for="titel">Titel</label>
-<div class="hint">Richtlijn uit de (voorbeeld)regelset: maximaal een aantal tekens, geen leestekens behalve een vraagteken.</div>
-<input type="text" id="titel" placeholder="Bijv.: Hoe vraag ik een nieuw paspoort aan?">
-
-<label for="intro">Introductie</label>
-<div class="hint">Het korte antwoord/de samenvatting bovenaan de pagina.</div>
-<textarea id="intro" rows="3" placeholder="Korte introductietekst..."></textarea>
-
-<label for="hoofdtekst">Hoofdtekst</label>
-<div class="hint">Zet een tussenkop op een eigen regel die begint met <code>##</code>, bijvoorbeeld: <code>## Wat heeft u nodig</code></div>
-<textarea id="hoofdtekst" rows="12" placeholder="Plak of typ hier de conceptletekst..."></textarea>
-
-<button onclick="controleer()">Controleer tekst</button>
 
 <div class="resultaten" id="resultaten-invoer"></div>
 
-<h2>2. Prompt genereren voor Claude.ai</h2>
-<p>Deze stap bouwt een kant-en-klare prompt met de regelset, je taak en de ingevoerde tekst. Kopieer de prompt en plak hem in Claude.ai — de AI doet daar het eigenlijke (her)schrijven.</p>
+<h2><span class="stapnummer">2</span>Verbeteren</h2>
 
-<label for="taak">Taak</label>
-<select id="taak">
-  <option value="nieuw">Nieuwe tekst schrijven op basis van de invoer</option>
-  <option value="verbeteren">Bestaande tekst verbeteren/aanvullen</option>
-  <option value="herschrijven">Pagina volledig herschrijven</option>
-</select>
-
-<button onclick="genereerPrompt()">Genereer prompt</button>
-
-<div id="prompt-sectie" style="display:none;">
-  <label for="prompt-output">Gegenereerde prompt</label>
-  <textarea id="prompt-output" rows="10" readonly></textarea>
-  <button class="secundair" onclick="kopieerPrompt()">Kopieer prompt</button>
-  <span id="kopieer-status" class="hint"></span>
+<div class="knoppenrij">
+  <button class="secundair" onclick="verbeter()">Verbeter</button>
 </div>
 
-<h2>3. AI-resultaat terugplakken en vergelijken</h2>
-<p>Plak hieronder de tekst die Claude.ai teruggaf. De regelcheck draait opnieuw, zodat je voor en na kunt vergelijken.</p>
+<div id="verbeter-voorstellen"></div>
+<div class="knoppenrij" id="verbeter-actie" style="display:none;">
+  <button onclick="neemVerbeteringenOver()">Neem over</button>
+</div>
 
-<label for="ai-output">Herschreven tekst (uit Claude.ai)</label>
-<textarea id="ai-output" rows="12" placeholder="Plak hier de AI-output..."></textarea>
+<h2><span class="stapnummer">3</span>Herschrijven <span class="status">(binnenkort)</span></h2>
 
-<button onclick="vergelijk()">Vergelijk met origineel</button>
+<div class="knoppenrij">
+  <button class="uit" disabled title="Hiervoor is een Anthropic API-sleutel nodig. Deze knop wordt in een volgende stap gebouwd.">Herschrijf</button>
+</div>
+<div class="toelichting">Vraagt straks een eigen API-sleutel. Tot die tijd: het alternatief hieronder.</div>
 
-<div class="resultaten" id="resultaten-vergelijking"></div>
+<details>
+  <summary>Alternatief: prompt kopiëren en resultaat terugplakken</summary>
 
-<footer>Redactiehulp — demo. Regelset in dit bestand is een placeholder, geen officiële NWW-schrijfwijzer.</footer>
+  <label for="taak">Taak</label>
+  <select id="taak">
+    <option value="nieuw">Nieuwe tekst schrijven op basis van de invoer</option>
+    <option value="verbeteren">Bestaande tekst verbeteren/aanvullen</option>
+    <option value="herschrijven">Pagina volledig herschrijven</option>
+  </select>
+
+  <button class="secundair" onclick="genereerPrompt()">Genereer prompt</button>
+
+  <div id="prompt-sectie" style="display:none;">
+    <label for="prompt-output">Gegenereerde prompt</label>
+    <textarea id="prompt-output" rows="10" readonly></textarea>
+    <button class="secundair" onclick="kopieerPrompt()">Kopieer prompt</button>
+    <span id="kopieer-status" class="hint"></span>
+  </div>
+
+  <label for="ai-output">Herschreven tekst terugplakken</label>
+  <div class="hint">Gebruikt de app de labels "Titel"/"Introductie"/"Gemaakte keuzes"? Dan worden die apart herkend.</div>
+  <textarea id="ai-output" rows="12" placeholder="Plak hier de AI-output..."></textarea>
+
+  <button class="secundair" onclick="vergelijk()">Vergelijk met origineel</button>
+
+  <div class="resultaten" id="resultaten-vergelijking"></div>
+</details>
+
+</main>
+
+<footer>Redactiehulp — demoversie. Regelset is een placeholder, geen officiële NWW-schrijfwijzer.</footer>
 
 <script>
 /* ==========================================================================
    PLACEHOLDER-REGELSET — dit is FICTIEVE voorbeeldinhoud, geen NWW-schrijfwijzer.
-   Vervang dit RULES-blok door de echte regelset voor daadwerkelijk gebruik.
+   Vervang dit RULES-blok (en de lijsten WOORDVERVANGINGEN/AFKORTINGEN/
+   TOEGESTANE_KOP_LABELS eronder) door de echte regelset voor daadwerkelijk gebruik.
    Elke regel heeft: id, titel, categorie, bron, scope ('titel'|'intro'|'tekst'),
-   en check(value) die een array van {fragment, detail} teruggeeft (of leeg).
+   autoFixable (kan de app dit zelf oplossen in stap 2?) en check(value), die een
+   array van {fragment, detail} teruggeeft (of leeg).
    ========================================================================== */
+
+// Kopjes die beginnen met een label + nummer + dubbele punt zijn toegestaan,
+// bijvoorbeeld "Stap 3: Vraag het visum aan". Pas deze lijst aan als er meer
+// (of minder) toegestane labels zijn.
+const TOEGESTANE_KOP_LABELS = /^(Stap|Vraag|Deel|Fase)\s+\d+\s*:/i;
+
+// Woorden/uitdrukkingen die vervangen worden door een alternatief. Wordt
+// gebruikt voor de controle én voor de automatische verbetering in stap 2.
+const WOORDVERVANGINGEN = [
+  { regex: /\buiteraard\b/gi, vervanging: "natuurlijk", toelichting: "Gebruik in deze demo liever “natuurlijk”." },
+  { regex: /\bkomt u er niet uit\b/gi, vervanging: "heeft u nog vragen", toelichting: "Vermijd de negatieve formulering; gebruik een positieve variant." }
+];
+
+// Afkortingen die de eerste keer voluit moeten staan, met de afkorting
+// erachter tussen haakjes.
+const AFKORTINGEN = [
+  { afkorting: "IND", voluit: "Immigratie- en Naturalisatiedienst" },
+  { afkorting: "SVB", voluit: "Sociale Verzekeringsbank" }
+];
+
 const RULES = [
   {
     id: "titel-lengte",
@@ -172,6 +259,7 @@ const RULES = [
     categorie: "Vindbaarheid (voorbeeld)",
     bron: "Voorbeeldregel — vervang door echte regelset",
     scope: "titel",
+    autoFixable: false,
     check(v) {
       if (!v) return [];
       return v.length > 60 ? [{ fragment: v, detail: `${v.length} tekens (richtlijn: max. 60)` }] : [];
@@ -183,10 +271,20 @@ const RULES = [
     categorie: "Vindbaarheid (voorbeeld)",
     bron: "Voorbeeldregel — vervang door echte regelset",
     scope: "titel",
+    autoFixable: true,
     check(v) {
       if (!v) return [];
-      const zonderVraagteken = v.replace(/\?\s*$/, "");
-      return /[.,;:!]/.test(zonderVraagteken) ? [{ fragment: v, detail: "Gebruik geen leestekens in de titel, behalve een vraagteken aan het eind." }] : [];
+      const analyse = analyseerTitelLeestekens(v);
+      if (!analyse) return [];
+      return [{
+        fragment: v,
+        detail: analyse.alleenAfsluitend
+          ? "Gebruik geen leestekens in de titel, behalve een vraagteken aan het eind."
+          : "Er staat een leesteken midden in de titel (bijvoorbeeld tussen twee zinnen). Herschrijf de titel als 1 zin — dit kan de app niet automatisch oplossen.",
+        // Alleen een leesteken aan het eind is een veilige, mechanische verwijdering.
+        // Eentje midden in de titel weghalen plakt twee zinnen aan elkaar; dat vraagt een redacteur.
+        autoFixable: analyse.alleenAfsluitend
+      }];
     }
   },
   {
@@ -195,6 +293,7 @@ const RULES = [
     categorie: "Structuur (voorbeeld)",
     bron: "Voorbeeldregel — vervang door echte regelset",
     scope: "intro",
+    autoFixable: false,
     check(v) {
       if (!v) return [];
       const n = telWoorden(v);
@@ -207,18 +306,56 @@ const RULES = [
     categorie: "Leesbaarheid (voorbeeld)",
     bron: "Voorbeeldregel — vervang door echte regelset",
     scope: "tekst",
+    autoFixable: false,
     check(v) {
       return zinnen(v).filter(z => telWoorden(z) > 18).map(z => ({ fragment: z.trim(), detail: `${telWoorden(z)} woorden (richtlijn: max. 18)` }));
     }
   },
   {
-    id: "voorbeeldwoord",
-    titel: "Vermijd het voorbeeldwoord “uiteraard”",
+    id: "afgeraden-woorden",
+    titel: "Afgeraden woord of uitdrukking",
     categorie: "Stijl (voorbeeld)",
     bron: "Voorbeeldregel — vervang door echte regelset",
     scope: "tekst",
+    autoFixable: true,
     check(v) {
-      return vindPatroon(v, /\buiteraard\b/gi).map(m => ({ fragment: m.context, detail: "Gebruik in deze demo liever “natuurlijk”." }));
+      const gevonden = [];
+      WOORDVERVANGINGEN.forEach(w => {
+        w.regex.lastIndex = 0;
+        vindPatroon(v, w.regex).forEach(m => gevonden.push({ fragment: m.context, detail: `${w.toelichting}` }));
+      });
+      return gevonden;
+    }
+  },
+  {
+    id: "afkorting-niet-voluit",
+    titel: "Afkorting niet voluit geschreven",
+    categorie: "Toegankelijkheid (voorbeeld)",
+    bron: "Voorbeeldregel — vervang door echte regelset",
+    scope: "tekst",
+    autoFixable: true,
+    check(v) {
+      if (!v) return [];
+      const gevonden = [];
+      AFKORTINGEN.forEach(a => {
+        const bevatVoluit = v.includes(`${a.voluit} (${a.afkorting})`);
+        const bevatAfkorting = new RegExp(`\\b${a.afkorting}\\b`).test(v);
+        if (bevatAfkorting && !bevatVoluit) {
+          gevonden.push({ fragment: a.afkorting, detail: `Schrijf “${a.afkorting}” de eerste keer voluit: “${a.voluit} (${a.afkorting})”.` });
+        }
+      });
+      return gevonden;
+    }
+  },
+  {
+    id: "aanhalingstekens-term",
+    titel: "Aanhalingstekens om een term",
+    categorie: "Stijl (voorbeeld)",
+    bron: "Voorbeeldregel — vervang door echte regelset",
+    scope: "tekst",
+    autoFixable: true,
+    check(v) {
+      return vindAangehaaldeTermen(v).map(m => ({ fragment: m.context, detail: "Gebruik de term zonder aanhalingstekens." }));
     }
   }
 ];
@@ -264,10 +401,57 @@ function vindPatroon(tekst, regex) {
   while ((m = regex.exec(tekst)) !== null) {
     const start = Math.max(0, m.index - 25);
     const eind = Math.min(tekst.length, m.index + m[0].length + 25);
-    resultaten.push({ index: m.index, context: "…" + tekst.slice(start, eind).trim() + "…" });
+    resultaten.push({ index: m.index, tekst: m[0], context: "…" + tekst.slice(start, eind).trim() + "…" });
     if (m.index === regex.lastIndex) regex.lastIndex++;
   }
   return resultaten;
+}
+
+// Zoekt termen tussen rechte of typografische aanhalingstekens (max. 6 woorden).
+function vindAangehaaldeTermen(tekst) {
+  if (!tekst) return [];
+  const patronen = [/"([^"\n]{1,60})"/g, /“([^”\n]{1,60})”/g];
+  const resultaten = [];
+  patronen.forEach(regex => {
+    let m;
+    regex.lastIndex = 0;
+    while ((m = regex.exec(tekst)) !== null) {
+      if (telWoorden(m[1]) <= 6) {
+        const start = Math.max(0, m.index - 20);
+        const eind = Math.min(tekst.length, m.index + m[0].length + 20);
+        resultaten.push({ index: m.index, tekst: m[0], binnen: m[1], context: "…" + tekst.slice(start, eind).trim() + "…" });
+      }
+      if (m.index === regex.lastIndex) regex.lastIndex++;
+    }
+  });
+  return resultaten;
+}
+
+// Past de hoofdletter van het origineel toe op een vervangende tekst.
+function pasHoofdletterToe(origineel, vervanging) {
+  if (!origineel) return vervanging;
+  if (origineel[0] === origineel[0].toUpperCase() && origineel[0] !== origineel[0].toLowerCase()) {
+    return vervanging.charAt(0).toUpperCase() + vervanging.slice(1);
+  }
+  return vervanging;
+}
+
+// Analyseert leestekens in de titel (los van een eventueel eind-vraagteken).
+// Geeft null terug als er niets aan de hand is. Anders: { alleenAfsluitend, opgeschoond }.
+// "alleenAfsluitend" is alleen waar als het leesteken uitsluitend aan het einde
+// van de titel staat (dus vóór een eventueel vraagteken) — zo'n leesteken kan de
+// app veilig weghalen. Een leesteken middenin (bijvoorbeeld tussen 2 zinnen) plakt
+// bij weghalen de zinnen aan elkaar; dat vraagt een redacteur, geen automatische fix.
+function analyseerTitelLeestekens(v) {
+  const eindigtOpVraagteken = /\?\s*$/.test(v);
+  const kern = v.replace(/\?\s*$/, "");
+  if (!/[.,;:!]/.test(kern)) return null;
+
+  const kernZonderAfsluitend = kern.replace(/[.,;:!]+\s*$/, "");
+  const alleenAfsluitend = kernZonderAfsluitend !== kern && !/[.,;:!]/.test(kernZonderAfsluitend);
+  const opgeschoond = kernZonderAfsluitend.replace(/\s+/g, " ").trim() + (eindigtOpVraagteken ? "?" : "");
+
+  return { alleenAfsluitend, opgeschoond };
 }
 
 /* ==========================================================================
@@ -289,10 +473,14 @@ function voerControleUit(titelWaarde, introWaarde, hoofdtekstWaarde) {
     } catch (e) {
       gevonden = [];
     }
-    gevonden.forEach(g => issues.push({ ...g, ruleId: rule.id, titel: rule.titel, categorie: rule.categorie, bron: rule.bron }));
+    gevonden.forEach(g => issues.push({
+      ruleId: rule.id, titel: rule.titel, categorie: rule.categorie, bron: rule.bron,
+      autoFixable: rule.autoFixable, // een individuele issue kan dit overschrijven (zie titel-leesteken)
+      ...g
+    }));
   });
 
-  // Tussenkoppen worden los gecontroleerd op woordaantal (generieke, veelvoorkomende regel)
+  // Tussenkoppen worden los gecontroleerd (generieke, veelvoorkomende regels)
   koppen.forEach(kop => {
     if (telWoorden(kop) > 6) {
       issues.push({
@@ -301,7 +489,30 @@ function voerControleUit(titelWaarde, introWaarde, hoofdtekstWaarde) {
         categorie: "Structuur (voorbeeld)",
         bron: "Voorbeeldregel — vervang door echte regelset",
         fragment: kop,
-        detail: `${telWoorden(kop)} woorden (richtlijn: max. 6)`
+        detail: `${telWoorden(kop)} woorden (richtlijn: max. 6)`,
+        autoFixable: false
+      });
+    }
+    if (kop.includes(":") && !TOEGESTANE_KOP_LABELS.test(kop)) {
+      issues.push({
+        ruleId: "kop-dubbelepunt",
+        titel: "Dubbele punt in tussenkop",
+        categorie: "Structuur (voorbeeld)",
+        bron: "Voorbeeldregel — vervang door echte regelset",
+        fragment: kop,
+        detail: "Controleer of de dubbele punt hier klopt. Labels zoals “Stap 2:” zijn toegestaan; andere dubbele punten meestal niet.",
+        autoFixable: false
+      });
+    }
+    if (/^(De|Het|Een)\s+/i.test(kop)) {
+      issues.push({
+        ruleId: "kop-lidwoord",
+        titel: "Kop begint met een lidwoord",
+        categorie: "Structuur (voorbeeld)",
+        bron: "Voorbeeldregel — vervang door echte regelset",
+        fragment: kop,
+        detail: "Begin de kop niet met “de”, “het” of “een”.",
+        autoFixable: true
       });
     }
   });
@@ -315,41 +526,238 @@ function renderIssues(issues, containerId) {
     el.innerHTML = '<div class="geen-issues">Geen aandachtspunten gevonden op basis van de huidige regelset.</div>';
     return;
   }
-  el.innerHTML =
-    `<div class="telling">${issues.length} aandachtspunt(en) gevonden</div>` +
-    issues.map(i => `
-      <div class="issue">
-        <div class="titel">${escapeHtml(i.titel)} <span class="badge">${escapeHtml(i.categorie)}</span></div>
+  const kanOpgelost = issues.filter(i => i.autoFixable);
+  const vraagtRedacteur = issues.filter(i => !i.autoFixable);
+
+  const renderGroep = (lijst) => lijst.map(i => `
+      <div class="issue ${i.autoFixable ? 'fix-mogelijk' : 'fix-niet'}">
+        <div class="titel">${escapeHtml(i.titel)} <span class="badge">${escapeHtml(i.categorie)}</span>
+          <span class="fixlabel">${i.autoFixable ? 'De app kan dit oplossen (stap 2)' : 'Vraagt een redacteur'}</span>
+        </div>
         <div class="fragment">${escapeHtml(i.fragment)}</div>
         <div>${escapeHtml(i.detail)}</div>
         <div class="bron">Bron: ${escapeHtml(i.bron)}</div>
       </div>
     `).join("");
+
+  let html = `<div class="telling">${issues.length} aandachtspunt(en) gevonden — ${kanOpgelost.length} op te lossen in stap 2, ${vraagtRedacteur.length} vraagt een redacteur</div>`;
+  if (kanOpgelost.length) html += `<div class="groepskop">De app kan dit zelf oplossen (stap 2)</div>` + renderGroep(kanOpgelost);
+  if (vraagtRedacteur.length) html += `<div class="groepskop">Dit vraagt een redacteur</div>` + renderGroep(vraagtRedacteur);
+  el.innerHTML = html;
 }
 
 function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 }
 
+/* ==========================================================================
+   Titel/introductie/hoofdtekst herkennen uit het ene tekstveld. Er is met
+   opzet maar 1 invoerveld (geen aparte velden voor titel/introductie): dat
+   was verwarrend, en de redacteur plakt zo de hele pagina in 1 keer.
+
+   Met labels ("Titel"/"Introductie"/"Hoofdtekst" of "Tekst", elk op een
+   eigen regel) is de indeling expliciet — zelfde conventie als bij het
+   terugplakken van AI-output. Zonder labels geldt een simpele vuistregel:
+   de eerste regel is de titel, de 2e regel de introductie, de rest is de
+   hoofdtekst. Die vuistregel hoeft niet perfect te zijn: Controleer wijst
+   vanzelf op een titel die te lang is als de indeling een keer misgaat.
+   ========================================================================== */
+const INVOER_LABELS = ["titel", "introductie", "hoofdtekst", "tekst"];
+
+function herkenTitelIntroUitTekst(tekst) {
+  const regels = (tekst || "").split("\n");
+  const labelRegex = new RegExp(`^(${INVOER_LABELS.join("|")})\\s*:?\\s*$`, "i");
+
+  const labels = [];
+  regels.forEach((regel, index) => {
+    const m = regel.trim().match(labelRegex);
+    if (m) {
+      const naam = m[1].toLowerCase() === "tekst" ? "hoofdtekst" : m[1].toLowerCase();
+      labels.push({ naam, index });
+    }
+  });
+
+  if (labels.length > 0) {
+    const secties = {};
+    labels.forEach((label, i) => {
+      const eind = i + 1 < labels.length ? labels[i + 1].index : regels.length;
+      secties[label.naam] = regels.slice(label.index + 1, eind).join("\n").trim();
+    });
+    return { titel: secties.titel || "", intro: secties.introductie || "", hoofdtekst: secties.hoofdtekst || "" };
+  }
+
+  // Geen labels: vuistregel op basis van regelvolgorde.
+  const nietLegeRegels = [];
+  regels.forEach((regel, index) => { if (regel.trim() !== "") nietLegeRegels.push(index); });
+  if (nietLegeRegels.length === 0) return { titel: "", intro: "", hoofdtekst: "" };
+
+  const titelIndex = nietLegeRegels[0];
+  const introIndex = nietLegeRegels.length > 1 ? nietLegeRegels[1] : null;
+  const titel = regels[titelIndex].trim();
+  const intro = introIndex !== null ? regels[introIndex].trim() : "";
+  const hoofdtekstVanaf = introIndex !== null ? introIndex + 1 : titelIndex + 1;
+  const hoofdtekst = regels.slice(hoofdtekstVanaf).join("\n").trim();
+
+  return { titel, intro, hoofdtekst };
+}
+
+function huidigeOnderdelen() {
+  return herkenTitelIntroUitTekst(document.getElementById("tekst").value);
+}
+
 function controleer() {
-  const titel = document.getElementById("titel").value;
-  const intro = document.getElementById("intro").value;
-  const hoofdtekst = document.getElementById("hoofdtekst").value;
+  const { titel, intro, hoofdtekst } = huidigeOnderdelen();
   const issues = voerControleUit(titel, intro, hoofdtekst);
   renderIssues(issues, "resultaten-invoer");
 }
 
 /* ==========================================================================
-   Promptgenerator
+   Verbeteren (stap 2) — automatische, mechanische correcties zonder AI.
+   Elk voorstel heeft: id, veld ('titel'|'intro'|'hoofdtekst'), zoek (exacte
+   originele tekst), vervang (nieuwe tekst), omschrijving.
+   ========================================================================== */
+function vindVerbeterVoorstellen(titel, intro, hoofdtekst) {
+  const voorstellen = [];
+  let volgnummer = 0;
+  const volgende = () => `voorstel-${++volgnummer}`;
+
+  // 1. Titel: alleen een afsluitend leesteken weghalen (behalve een eind-vraagteken).
+  // Een leesteken midden in de titel (bijv. tussen 2 zinnen) laten we staan: dat
+  // zomaar weghalen plakt de zinnen aan elkaar. Zie analyseerTitelLeestekens().
+  if (titel) {
+    const analyse = analyseerTitelLeestekens(titel);
+    if (analyse && analyse.alleenAfsluitend) {
+      voorstellen.push({
+        id: volgende(), veld: "titel", zoek: titel, vervang: analyse.opgeschoond,
+        omschrijving: "Afsluitend leesteken uit de titel gehaald (een eventueel vraagteken aan het eind blijft staan)."
+      });
+    }
+  }
+
+  // 2. Kop-lidwoord weghalen, per regel van de hoofdtekst
+  (hoofdtekst || "").split("\n").forEach(regel => {
+    const m = regel.match(/^(##\s+)(De|Het|Een)\s+(.+)$/i);
+    if (m) {
+      const restMetHoofdletter = m[3].charAt(0).toUpperCase() + m[3].slice(1);
+      const nieuweRegel = m[1] + restMetHoofdletter;
+      voorstellen.push({
+        id: volgende(), veld: "hoofdtekst", zoek: regel, vervang: nieuweRegel,
+        omschrijving: `Lidwoord “${m[2]}” aan het begin van de kop weggehaald.`
+      });
+    }
+  });
+
+  // 3. Afgeraden woorden vervangen — per veld, zodat we de exacte tekst weten
+  const velden = [["titel", titel], ["intro", intro], ["hoofdtekst", hoofdtekst]];
+  velden.forEach(([naam, waarde]) => {
+    if (!waarde) return;
+    WOORDVERVANGINGEN.forEach(w => {
+      const regex = new RegExp(w.regex.source, w.regex.flags.includes("g") ? w.regex.flags : w.regex.flags + "g");
+      regex.lastIndex = 0;
+      vindPatroon(waarde, regex).forEach(m => {
+        voorstellen.push({
+          id: volgende(), veld: naam, zoek: m.tekst, vervang: pasHoofdletterToe(m.tekst, w.vervanging),
+          omschrijving: w.toelichting
+        });
+      });
+    });
+  });
+
+  // 4. Aanhalingstekens om een term weghalen — per veld
+  velden.forEach(([naam, waarde]) => {
+    if (!waarde) return;
+    vindAangehaaldeTermen(waarde).forEach(m => {
+      voorstellen.push({
+        id: volgende(), veld: naam, zoek: m.tekst, vervang: m.binnen,
+        omschrijving: "Aanhalingstekens om de term weggehaald."
+      });
+    });
+  });
+
+  // 5. Afkorting voluit schrijven bij de eerste vermelding (in de hoofdtekst)
+  if (hoofdtekst) {
+    AFKORTINGEN.forEach(a => {
+      const bevatVoluit = hoofdtekst.includes(`${a.voluit} (${a.afkorting})`);
+      const regex = new RegExp(`\\b${a.afkorting}\\b`);
+      const m = regex.exec(hoofdtekst);
+      if (m && !bevatVoluit) {
+        voorstellen.push({
+          id: volgende(), veld: "hoofdtekst", zoek: m[0], vervang: `${a.voluit} (${a.afkorting})`,
+          omschrijving: `“${a.afkorting}” voluit geschreven bij de eerste vermelding.`
+        });
+      }
+    });
+  }
+
+  return voorstellen;
+}
+
+let LAATSTE_VOORSTELLEN = [];
+
+const VELDNAMEN = { titel: "titel", intro: "introductie", hoofdtekst: "hoofdtekst" };
+
+function verbeter() {
+  const { titel, intro, hoofdtekst } = huidigeOnderdelen();
+  LAATSTE_VOORSTELLEN = vindVerbeterVoorstellen(titel, intro, hoofdtekst);
+
+  const container = document.getElementById("verbeter-voorstellen");
+  const actieRij = document.getElementById("verbeter-actie");
+
+  if (LAATSTE_VOORSTELLEN.length === 0) {
+    container.innerHTML = '<div class="geen-voorstellen">Geen automatische verbeteringen gevonden. Punten die taalgevoel vragen, staan bij "Controleer" onder "Dit vraagt een redacteur".</div>';
+    actieRij.style.display = "none";
+    return;
+  }
+
+  container.innerHTML =
+    `<div class="telling">${LAATSTE_VOORSTELLEN.length} voorstel(len) — vink aan wat je wilt overnemen</div>` +
+    LAATSTE_VOORSTELLEN.map(v => `
+      <div class="voorstel">
+        <input type="checkbox" id="${v.id}" checked data-veld="${escapeHtml(v.veld)}">
+        <div class="inhoud">
+          <label for="${v.id}" style="display:inline; font-weight:400;">
+            <span class="van">${escapeHtml(v.zoek)}</span> → <span class="naar">${escapeHtml(v.vervang)}</span>
+          </label>
+          <div class="omschrijving">${escapeHtml(v.omschrijving)} (${escapeHtml(VELDNAMEN[v.veld] || v.veld)})</div>
+        </div>
+      </div>
+    `).join("");
+  actieRij.style.display = "flex";
+}
+
+function neemVerbeteringenOver() {
+  // Alle voorstellen (titel/intro/hoofdtekst) zijn stukjes van hetzelfde,
+  // ene tekstveld — dus rechtstreeks toepassen op de volledige tekst houdt
+  // de oorspronkelijke opmaak (regels, eventuele labels) vanzelf intact.
+  const tekstVeld = document.getElementById("tekst");
+  let huidigeTekst = tekstVeld.value;
+  let aantalToegepast = 0;
+
+  LAATSTE_VOORSTELLEN.forEach(v => {
+    const checkbox = document.getElementById(v.id);
+    if (!checkbox || !checkbox.checked) return;
+    if (huidigeTekst.includes(v.zoek)) {
+      huidigeTekst = huidigeTekst.replace(v.zoek, v.vervang);
+      aantalToegepast++;
+    }
+  });
+
+  tekstVeld.value = huidigeTekst;
+
+  document.getElementById("verbeter-voorstellen").innerHTML =
+    `<div class="geen-voorstellen">${aantalToegepast} verbetering(en) overgenomen in de tekst hierboven. Klik nogmaals op "Verbeter" om te zien wat er nog overblijft, of ga verder met "Controleer".</div>`;
+  document.getElementById("verbeter-actie").style.display = "none";
+}
+
+/* ==========================================================================
+   Promptgenerator (alternatief zolang stap 3 nog niet gebouwd is)
    ========================================================================== */
 function bouwRegelsSamenvatting() {
   return RULES.map(r => `- ${r.titel} (${r.categorie})`).join("\n");
 }
 
 function genereerPrompt() {
-  const titel = document.getElementById("titel").value.trim();
-  const intro = document.getElementById("intro").value.trim();
-  const hoofdtekst = document.getElementById("hoofdtekst").value.trim();
+  const { titel, intro, hoofdtekst } = huidigeOnderdelen();
   const taak = document.getElementById("taak").value;
 
   const taakTekst = {
@@ -376,7 +784,7 @@ function genereerPrompt() {
     "Tekst:",
     hoofdtekst || "(geen tekst meegegeven)",
     "",
-    "Geef de herschreven/nieuwe tekst terug, met titel, introductie en tussenkoppen duidelijk gemarkeerd."
+    "Geef de herschreven/nieuwe tekst terug. Zet de labels \"Titel\", \"Introductie\" en (indien van toepassing) \"Metadescription\" en \"Gemaakte keuzes\" elk op een eigen regel, gevolgd door de bijbehorende inhoud, zodat de onderdelen apart herkenbaar zijn."
   ].join("\n");
 
   document.getElementById("prompt-output").value = prompt;
@@ -409,16 +817,63 @@ function kopieerViaFallback(textarea, status) {
 }
 
 /* ==========================================================================
-   Voor/na-vergelijking
+   Voor/na-vergelijking — herkent "Titel"/"Introductie"/"Metadescription"/
+   "Gemaakte keuzes" als de AI-output die labels elk op een eigen regel
+   gebruikt (zoals de promptgenerator vraagt). Titel en introductie worden
+   dan ook echt gecontroleerd, en "Gemaakte keuzes" (de verantwoording van
+   de AI) telt niet meer mee als webtekst.
+
+   Herkenning is bewust bescheiden: van titel/introductie/metadescription
+   wordt alleen de regel direct na het label gebruikt. Bij twijfel te
+   weinig meenemen is veiliger dan per ongeluk de hoofdtekst laten
+   verdwijnen in het verkeerde vak. Zonder herkenbare labels (bijvoorbeeld
+   bij vrij geplakte tekst) blijft het oude gedrag gewoon werken: dan gaat
+   alles naar de hoofdtekst.
    ========================================================================== */
+const AI_OUTPUT_LABELS = ["titel", "introductie", "metadescription", "gemaakte keuzes"];
+
+function ontleedAiOutput(tekst) {
+  const regels = (tekst || "").split("\n");
+  const labelRegex = new RegExp(`^(${AI_OUTPUT_LABELS.join("|")})\\s*:?\\s*$`, "i");
+
+  const labels = [];
+  regels.forEach((regel, index) => {
+    const m = regel.trim().match(labelRegex);
+    if (m) labels.push({ naam: m[1].toLowerCase(), index });
+  });
+
+  if (labels.length === 0) {
+    // Geen herkenbare labels: behandel alles als hoofdtekst (oud gedrag).
+    return { titel: "", intro: "", hoofdtekst: tekst || "" };
+  }
+
+  const vindLabel = (naam) => labels.find(l => l.naam === naam);
+  const titelLabel = vindLabel("titel");
+  const introLabel = vindLabel("introductie");
+  const metaLabel = vindLabel("metadescription");
+  const keuzesLabel = vindLabel("gemaakte keuzes");
+
+  const uitgesloten = new Set(labels.map(l => l.index));
+  [titelLabel, introLabel, metaLabel].forEach(l => { if (l) uitgesloten.add(l.index + 1); });
+  if (keuzesLabel) {
+    for (let i = keuzesLabel.index; i < regels.length; i++) uitgesloten.add(i);
+  }
+
+  const hoofdtekst = regels.filter((_, i) => !uitgesloten.has(i)).join("\n").trim();
+  const titel = titelLabel ? (regels[titelLabel.index + 1] || "").trim() : "";
+  const intro = introLabel ? (regels[introLabel.index + 1] || "").trim() : "";
+
+  return { titel, intro, hoofdtekst };
+}
+
 function vergelijk() {
-  const titel = document.getElementById("titel").value;
-  const intro = document.getElementById("intro").value;
-  const hoofdtekst = document.getElementById("hoofdtekst").value;
+  const { titel, intro, hoofdtekst } = huidigeOnderdelen();
   const aiOutput = document.getElementById("ai-output").value;
 
+  const ontleed = ontleedAiOutput(aiOutput);
+
   const voorIssues = voerControleUit(titel, intro, hoofdtekst);
-  const naIssues = voerControleUit("", "", aiOutput);
+  const naIssues = voerControleUit(ontleed.titel, ontleed.intro, ontleed.hoofdtekst);
 
   const el = document.getElementById("resultaten-vergelijking");
   el.innerHTML = `
