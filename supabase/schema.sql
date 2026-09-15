@@ -12,7 +12,8 @@
 --   * actief = true bepaalt of dat account bij de GEGEVENS mag.
 --   * Autorisatie gaat op user_id, niet op e-mail: een e-mailwijziging geeft
 --     dus nooit toegang tot andermans rij.
---   * Alle inhoud hieronder is FICTIEF.
+--   * Regels zijn 'controle' (automatisch getoetst) of 'richtlijn' (gaat mee
+--     in de prompt). Zie supabase/regeltypen.md.
 -- =============================================================================
 
 
@@ -122,16 +123,23 @@ create table if not exists public.schrijfwijzer_regel (
   id              text    primary key,
   titel           text    not null,
   categorie       text    not null,
+  hoofdstuk       text    not null default 'Overig',
+  soort           text    not null default 'controle'
+                    check (soort in ('controle', 'richtlijn')),
   bron            text    not null,
-  scope           text    not null check (scope in ('titel', 'intro', 'tekst', 'kop')),
+  scope           text    not null check (scope in ('titel', 'intro', 'tekst', 'kop', 'alles')),
   type            text    not null check (type in (
+                    'geen',
                     'max_tekens', 'geen_leestekens', 'max_woorden',
-                    'max_woorden_per_zin', 'verboden_woord', 'max_woorden_kop')),
+                    'max_woorden_per_zin', 'max_woorden_per_alinea', 'max_woorden_kop',
+                    'verboden_woorden', 'kop_lidwoord', 'lijdende_vorm',
+                    'vraag_reeks', 'regex_verboden',
+                    'intro_start_vraag', 'intro_start_ja_nee')),
   parameters      jsonb   not null default '{}'::jsonb,
   uitleg          text    not null default '',
   volgorde        integer not null default 0,
   actief          boolean not null default true,
-  regelset_versie text    not null default 'fictief-v1'
+  regelset_versie text    not null default 'onbekend'
 );
 
 alter table public.schrijfwijzer_regel enable row level security;
@@ -147,7 +155,10 @@ revoke insert, update, delete on public.schrijfwijzer_regel from anon, authentic
 
 
 -- -----------------------------------------------------------------------------
--- 5. Fictieve regelset (staat al geladen)
+-- 5. De inhoud van de regelset staat NIET in deze repo
 -- -----------------------------------------------------------------------------
--- Zie supabase/regelset-fictief.sql voor de inhoud. Dit is uitdrukkelijk NIET
--- de echte NWW-schrijfwijzer.
+-- De tabel is gevuld met de echte NWW-schrijfwijzer (regelset_versie NWW-2026-09):
+-- 22 controleregels en 43 richtlijnen. Die inhoud is intern en staat daarom
+-- alleen in de database, niet in deze openbare repo.
+--
+-- Zie supabase/regeltypen.md voor de structuur en voor hoe je een regel toevoegt.

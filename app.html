@@ -305,8 +305,11 @@ async function verwerkSessie(sessie){
 
   REGELS = regels;
   document.getElementById("app-email").textContent = email;
+  const aantalControle   = regels.filter(r => r.soort === "controle").length;
+  const aantalRichtlijn  = regels.filter(r => r.soort === "richtlijn").length;
   document.getElementById("regel-telling").textContent =
-    regels.length + " regels geladen (versie " + (regels[0].regelset_versie || "onbekend") + ")";
+    aantalControle + " controleregels en " + aantalRichtlijn + " richtlijnen (versie " +
+    (regels[0].regelset_versie || "onbekend") + ")";
   toon("app");
 }
 
@@ -365,6 +368,9 @@ function zinnen(t){
   const m = (t || "").match(/[^.!?]+[.!?]+|[^.!?]+$/g);
   return m ? m.map(z => z.trim()).filter(Boolean) : [];
 }
+function alineas(tekst){
+  return (tekst || "").split(/\n\s*\n/).map(a => a.trim()).filter(Boolean);
+}
 function splitsKoppenEnTekst(t){
   const koppen = [], body = [];
   (t || "").split("\n").forEach(r => {
@@ -386,65 +392,174 @@ function vindPatroon(tekst, regex){
 }
 function escapeRegex(s){ return String(s).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
 
-/* Elke regel uit de database heeft een type; de logica per type staat hier. */
+/* Zoekt een losse term, ook als die een punt bevat (bijv.) — zonder lookbehind,
+   zodat het ook werkt in browsers die dat niet ondersteunen. */
+function vindTerm(tekst, term){
+  const uit = [];
+  if (!tekst) return uit;
+  const re = new RegExp("(^|[^A-Za-z\\u00C0-\\u024F0-9])(" + escapeRegex(term) + ")(?![A-Za-z\\u00C0-\\u024F0-9])", "gi");
+  let m;
+  while ((m = re.exec(tekst)) !== null){
+    const begin = m.index + m[1].length;
+    const a = Math.max(0, begin - 25);
+    const b = Math.min(tekst.length, begin + m[2].length + 25);
+    uit.push({ context: "…" + tekst.slice(a, b).trim() + "…", woord: m[2] });
+    if (re.lastIndex === m.index) re.lastIndex++;
+  }
+  return uit;
+}
+
+/* Elke regel uit de database heeft een type; de logica per type staat hier.
+   Een controle krijgt (waarde, parameters, context) en geeft een lijst bevindingen. */
 const CONTROLES = {
   max_tekens(v, p){
     if (!v) return [];
-    const max = p.max || 60;
+    const max = p.max || 70;
     return v.length > max ? [{ fragment: v, detail: v.length + " tekens (richtlijn: max. " + max + ")" }] : [];
   },
+
   geen_leestekens(v, p){
     if (!v) return [];
     const slot = p.toegestaan_slot || "?";
-    const zonder = v.replace(new RegExp(escapeRegex(slot) + "\\s*$"), "");
+    const zonder = String(v).replace(new RegExp(escapeRegex(slot) + "\\s*$"), "");
     return /[.,;:!]/.test(zonder)
       ? [{ fragment: v, detail: "Gebruik geen leestekens, behalve “" + slot + "” aan het eind." }] : [];
   },
+
   max_woorden(v, p){
     if (!v) return [];
-    const max = p.max || 40, n = telWoorden(v);
+    const max = p.max || 50, n = telWoorden(v);
     return n > max ? [{ fragment: v.slice(0, 60) + "…", detail: n + " woorden (richtlijn: max. " + max + ")" }] : [];
   },
+
   max_woorden_per_zin(v, p){
-    const max = p.max || 18;
+    const max = p.max || 15;
     return zinnen(v).filter(z => telWoorden(z) > max)
       .map(z => ({ fragment: z.trim(), detail: telWoorden(z) + " woorden (richtlijn: max. " + max + ")" }));
   },
-  verboden_woord(v, p){
-    const woord = p.woord || "";
-    if (!woord) return [];
-    const re = new RegExp("\\b" + escapeRegex(woord) + "\\b", "gi");
+
+  max_woorden_per_alinea(v, p){
+    const max = p.max || 80;
+    return alineas(v).filter(a => telWoorden(a) > max)
+      .map(a => ({ fragment: a.slice(0, 70) + "…", detail: telWoorden(a) + " woorden in deze alinea (richtlijn: max. " + max + ")" }));
+  },
+
+  max_woorden_kop(kop, p){
+    const max = p.max || 5;
+    return telWoorden(kop) > max
+      ? [{ fragment: kop, detail: telWoorden(kop) + " woorden (richtlijn: max. " + max + ")" }] : [];
+  },
+
+  kop_lidwoord(kop, p){
+    const lidwoorden = p.lidwoorden || ["de", "het", "een"];
+    const eerste = String(kop || "").trim().split(/\s+/)[0] || "";
+    return lidwoorden.indexOf(eerste.toLowerCase()) !== -1
+      ? [{ fragment: kop, detail: "Begint met het lidwoord “" + eerste + "”." }] : [];
+  },
+
+  verboden_woorden(v, p){
+    const woorden = p.woorden || [];
+    const uit = [];
+    woorden.forEach(w => {
+      vindTerm(v, w).forEach(m => uit.push({
+        fragment: m.context,
+        detail: p.alternatief ? "Gebruik liever: " + p.alternatief + "." : "Vermijd “" + w + "”."
+      }));
+    });
+    return uit;
+  },
+
+  regex_verboden(v, p){
+    if (!v || !p.patroon) return [];
+    let re;
+    const vlaggen = p.hoofdlettergevoelig ? "g" : "gi";
+    try { re = new RegExp(p.patroon, vlaggen); } catch (e) { return []; }
     return vindPatroon(v, re).map(m => ({
       fragment: m.context,
-      detail: p.alternatief ? "Gebruik liever “" + p.alternatief + "”." : "Vermijd dit woord."
+      detail: p.alternatief ? "Gebruik liever: " + p.alternatief + "." : "Dit hoort hier niet te staan."
     }));
   },
-  max_woorden_kop(koppen, p){
-    const max = p.max || 6;
-    return (koppen || []).filter(k => telWoorden(k) > max)
-      .map(k => ({ fragment: k, detail: telWoorden(k) + " woorden (richtlijn: max. " + max + ")" }));
+
+  /* Heuristiek: alleen vormen van "worden" met een voltooid deelwoord.
+     Vormen met "zijn" laten we staan, anders markeren we elke voltooide tijd. */
+  lijdende_vorm(v, p){
+    /* ge... (gemaakt), opge.../aange... (opgestuurd), en be-/ver-/ont-/her- op -d of -t (verwerkt). */
+    const re = /\b(wordt|worden|werd|werden)\s+(?:\w+\s+){0,3}(ge\w{2,}|[a-z]+ge\w{2,}|(?:be|ver|ont|her)\w{2,}[dt])\b/gi;
+    return vindPatroon(v, re).map(m => ({
+      fragment: m.context,
+      detail: "Mogelijk lijdende vorm. Schrijf actief waar dat kan."
+    }));
+  },
+
+  vraag_reeks(v, p){
+    const max = p.max || 2;
+    const uit = [];
+    let reeks = [];
+    const sluit = () => {
+      if (reeks.length > max){
+        uit.push({
+          fragment: reeks[0].slice(0, 60) + "…",
+          detail: reeks.length + " vragen achter elkaar (richtlijn: maximaal " + max + ")"
+        });
+      }
+      reeks = [];
+    };
+    zinnen(v).forEach(z => { if (/\?\s*$/.test(z.trim())) reeks.push(z.trim()); else sluit(); });
+    sluit();
+    return uit;
+  },
+
+  intro_start_vraag(intro, p, ctx){
+    if (!intro || !ctx || !ctx.titel) return [];
+    if (!/\?\s*$/.test(ctx.titel.trim())) return [];
+    const eerste = (zinnen(intro)[0] || "").trim();
+    return /\?\s*$/.test(eerste)
+      ? [{ fragment: eerste, detail: "De titel is al een vraag; begin de intro dan niet met een vraag." }] : [];
+  },
+
+  intro_start_ja_nee(intro, p, ctx){
+    if (!intro) return [];
+    const eerste = (zinnen(intro)[0] || "").trim();
+    return /^(ja|nee)\b/i.test(eerste)
+      ? [{ fragment: eerste, detail: "Geef antwoord op een gesloten vraag zonder “ja” of “nee”." }] : [];
   }
 };
 
 function voerControleUit(titelWaarde, introWaarde, hoofdtekstWaarde){
-  if (REGELS.length === 0) return null;           // geen regelset = geen oordeel
+  if (REGELS.length === 0) return null;                 // geen regelset = geen oordeel
+  const controles = REGELS.filter(r => r.soort === "controle");
   const { koppen, bodyTekst } = splitsKoppenEnTekst(hoofdtekstWaarde);
+  const volledig = [naarZinseinde(titelWaarde), naarZinseinde(introWaarde), bodyTekst].filter(Boolean).join("\n\n");
+  /* 'alles' neemt ook de tussenkoppen mee; die zijn uit bodyTekst gehaald. */
+  const alles = [naarZinseinde(titelWaarde), naarZinseinde(introWaarde), koppen.join("\n"), bodyTekst]
+                  .filter(Boolean).join("\n\n");
+  const ctx = { titel: titelWaarde, intro: introWaarde };
   const issues = [];
 
-  REGELS.forEach(regel => {
+  controles.forEach(regel => {
     const fn = CONTROLES[regel.type];
     if (!fn) return;
-
-    let invoer;
-    if (regel.scope === "titel")      invoer = titelWaarde;
-    else if (regel.scope === "intro") invoer = introWaarde;
-    else if (regel.scope === "kop")   invoer = koppen;
-    else invoer = [naarZinseinde(titelWaarde), naarZinseinde(introWaarde), bodyTekst].filter(Boolean).join("\n\n");
-
+    const p = regel.parameters || {};
     let gevonden = [];
-    try { gevonden = fn(invoer, regel.parameters || {}) || []; } catch (e) { gevonden = []; }
+    try {
+      if (regel.scope === "kop"){
+        koppen.forEach(kop => { gevonden = gevonden.concat(fn(kop, p, ctx) || []); });
+      } else {
+        let invoer;
+        if (regel.scope === "titel")      invoer = titelWaarde;
+        else if (regel.scope === "intro") invoer = introWaarde;
+        else if (regel.scope === "alles") invoer = alles;
+        else                              invoer = volledig;   // 'tekst'
+        gevonden = fn(invoer, p, ctx) || [];
+      }
+    } catch (e) {
+      gevonden = [];
+      if (window.console) console.warn("Regel " + regel.id + " kon niet worden uitgevoerd:", e);
+    }
+
     gevonden.forEach(g => issues.push({
-      ...g, ruleId: regel.id, titel: regel.titel, categorie: regel.categorie, bron: regel.bron
+      ...g, ruleId: regel.id, titel: regel.titel,
+      categorie: regel.hoofdstuk || regel.categorie, bron: regel.bron
     }));
   });
   return issues;
@@ -493,15 +608,50 @@ function genereerPrompt(){
     herschrijven: "Herschrijf onderstaande pagina volledig, met behoud van de feitelijke inhoud."
   }[document.getElementById("taak").value];
 
+  const controles   = REGELS.filter(r => r.soort === "controle");
+  const richtlijnen = REGELS.filter(r => r.soort === "richtlijn");
+
+  /* Harde normen: de regels die ook automatisch gecontroleerd worden. */
+  const normen = controles
+    .map(r => "- " + (r.uitleg || r.titel))
+    .join("\n");
+
+  /* Richtlijnen, gegroepeerd per succesfactor uit de schrijfwijzer. */
+  const perHoofdstuk = {};
+  richtlijnen.forEach(r => {
+    (perHoofdstuk[r.hoofdstuk] = perHoofdstuk[r.hoofdstuk] || []).push("- " + r.titel + ": " + (r.uitleg || ""));
+  });
+  const richtlijnTekst = Object.keys(perHoofdstuk)
+    .map(h => h + "\n" + perHoofdstuk[h].join("\n"))
+    .join("\n\n");
+
+  const versie = REGELS[0].regelset_versie || "onbekend";
+
   const prompt = [
-    "Je bent een redacteur die webteksten schrijft volgens onderstaande schrijfwijzerregels.",
-    "", "Regels waar de tekst aan moet voldoen:",
-    REGELS.map(r => "- " + r.titel + " (" + r.categorie + ")" + (r.uitleg ? " — " + r.uitleg : "")).join("\n"),
-    "", "Taak:", taakTekst,
-    "", "Titel (indien aanwezig):", titel || "(geen titel meegegeven)",
-    "", "Introductie (indien aanwezig):", intro || "(geen introductie meegegeven)",
-    "", "Tekst:", hoofdtekst || "(geen tekst meegegeven)",
-    "", "Geef de herschreven/nieuwe tekst terug, met titel, introductie en tussenkoppen duidelijk gemarkeerd."
+    "Je bent webredacteur bij NederlandWereldwijd. Je schrijft volgens de schrijfwijzer van de organisatie.",
+    "Hieronder staan eerst de harde normen, dan de richtlijnen per succesfactor.",
+    "",
+    "=== HARDE NORMEN (hier wordt ook automatisch op gecontroleerd) ===",
+    normen,
+    "",
+    "=== RICHTLIJNEN PER SUCCESFACTOR ===",
+    richtlijnTekst,
+    "",
+    "=== TAAK ===",
+    taakTekst,
+    "",
+    "Titel:",        titel      || "(geen titel meegegeven)",
+    "",
+    "Introductie:",  intro      || "(geen introductie meegegeven)",
+    "",
+    "Tekst:",        hoofdtekst || "(geen tekst meegegeven)",
+    "",
+    "=== OPDRACHT ===",
+    "Geef de nieuwe of herschreven tekst terug met titel, introductie en tussenkoppen duidelijk gemarkeerd.",
+    "Zet tussenkoppen op een eigen regel die begint met ##.",
+    "Noem daarna kort welke keuzes je hebt gemaakt waarbij je van de brontekst bent afgeweken.",
+    "",
+    "(Regelset: " + versie + ")"
   ].join("\n");
 
   document.getElementById("prompt-output").value = prompt;

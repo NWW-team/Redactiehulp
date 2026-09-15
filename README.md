@@ -29,6 +29,10 @@ inloggen met een vooraf toegestaan account. De bijbehorende SQL staat in `supaba
 stap-voor-stap-instructies voor Supabase en Cloudflare, plus het testscript, staan in
 [`TOEGANG.md`](TOEGANG.md).
 
+De regelset in `app.html` komt uit de database, niet uit het bestand: de echte schrijfwijzer
+staat in Supabase achter RLS en is daarom bewust niet in deze openbare repo te vinden.
+`supabase/regeltypen.md` beschrijft alleen de structuur.
+
 Twee dingen om niet te verwarren: `app.html` en de JavaScript erin zijn gewoon publieke
 frontendbestanden — de bescherming zit in Cloudflare Access (vóór de bestanden) en in de
 RLS-policies (vóór de gegevens). In `supabase-config.js` hoort alleen de project-URL en de

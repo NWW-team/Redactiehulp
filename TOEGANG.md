@@ -256,8 +256,9 @@ Cloudflare bepaalt wie de bestanden krijgt, Supabase bepaalt wie de gegevens kri
 
 ## Wat hierna nog open staat
 
-- De **échte schrijfwijzer** zit nog niet in de database. Laad die pas als de tests
-  hierboven slagen, via **Table Editor** of een `insert`-query in de SQL Editor.
+- De **échte schrijfwijzer staat sinds 15 sep 2026 in de database** (`NWW-2026-09`):
+  22 controleregels en 43 richtlijnen. De inhoud staat bewust niet in deze repo.
+  Zie `supabase/regeltypen.md` om een regel toe te voegen of uit te zetten.
 - `index.html` blijft de onbeschermde demo met de placeholderregels.
 - De Supabase-bibliotheek komt van een CDN (`@supabase/supabase-js@2`, niet vastgepind).
   Voor een strengere opzet zet je een eigen kopie in de repo of pin je een versie met
