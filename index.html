@@ -263,8 +263,17 @@ const RULES = [
     autoFixable: true,
     check(v) {
       if (!v) return [];
-      const zonderVraagteken = v.replace(/\?\s*$/, "");
-      return /[.,;:!]/.test(zonderVraagteken) ? [{ fragment: v, detail: "Gebruik geen leestekens in de titel, behalve een vraagteken aan het eind." }] : [];
+      const analyse = analyseerTitelLeestekens(v);
+      if (!analyse) return [];
+      return [{
+        fragment: v,
+        detail: analyse.alleenAfsluitend
+          ? "Gebruik geen leestekens in de titel, behalve een vraagteken aan het eind."
+          : "Er staat een leesteken midden in de titel (bijvoorbeeld tussen twee zinnen). Herschrijf de titel als 1 zin — dit kan de app niet automatisch oplossen.",
+        // Alleen een leesteken aan het eind is een veilige, mechanische verwijdering.
+        // Eentje midden in de titel weghalen plakt twee zinnen aan elkaar; dat vraagt een redacteur.
+        autoFixable: analyse.alleenAfsluitend
+      }];
     }
   },
   {
@@ -416,6 +425,24 @@ function pasHoofdletterToe(origineel, vervanging) {
   return vervanging;
 }
 
+// Analyseert leestekens in de titel (los van een eventueel eind-vraagteken).
+// Geeft null terug als er niets aan de hand is. Anders: { alleenAfsluitend, opgeschoond }.
+// "alleenAfsluitend" is alleen waar als het leesteken uitsluitend aan het einde
+// van de titel staat (dus vóór een eventueel vraagteken) — zo'n leesteken kan de
+// app veilig weghalen. Een leesteken middenin (bijvoorbeeld tussen 2 zinnen) plakt
+// bij weghalen de zinnen aan elkaar; dat vraagt een redacteur, geen automatische fix.
+function analyseerTitelLeestekens(v) {
+  const eindigtOpVraagteken = /\?\s*$/.test(v);
+  const kern = v.replace(/\?\s*$/, "");
+  if (!/[.,;:!]/.test(kern)) return null;
+
+  const kernZonderAfsluitend = kern.replace(/[.,;:!]+\s*$/, "");
+  const alleenAfsluitend = kernZonderAfsluitend !== kern && !/[.,;:!]/.test(kernZonderAfsluitend);
+  const opgeschoond = kernZonderAfsluitend.replace(/\s+/g, " ").trim() + (eindigtOpVraagteken ? "?" : "");
+
+  return { alleenAfsluitend, opgeschoond };
+}
+
 /* ==========================================================================
    Regelcheck-engine: past alle RULES toe op titel/intro/tekst
    ========================================================================== */
@@ -435,7 +462,11 @@ function voerControleUit(titelWaarde, introWaarde, hoofdtekstWaarde) {
     } catch (e) {
       gevonden = [];
     }
-    gevonden.forEach(g => issues.push({ ...g, ruleId: rule.id, titel: rule.titel, categorie: rule.categorie, bron: rule.bron, autoFixable: rule.autoFixable }));
+    gevonden.forEach(g => issues.push({
+      ruleId: rule.id, titel: rule.titel, categorie: rule.categorie, bron: rule.bron,
+      autoFixable: rule.autoFixable, // een individuele issue kan dit overschrijven (zie titel-leesteken)
+      ...g
+    }));
   });
 
   // Tussenkoppen worden los gecontroleerd (generieke, veelvoorkomende regels)
@@ -521,26 +552,20 @@ function controleer() {
    Elk voorstel heeft: id, veld ('titel'|'intro'|'hoofdtekst'), zoek (exacte
    originele tekst), vervang (nieuwe tekst), omschrijving.
    ========================================================================== */
-function verwijderLeestekensTitel(v) {
-  const eindigtOpVraagteken = /\?\s*$/.test(v);
-  let kern = v.replace(/\?\s*$/, "");
-  kern = kern.replace(/[.,;:!]/g, "");
-  kern = kern.replace(/\s+/g, " ").trim();
-  return eindigtOpVraagteken ? kern + "?" : kern;
-}
-
 function vindVerbeterVoorstellen(titel, intro, hoofdtekst) {
   const voorstellen = [];
   let volgnummer = 0;
   const volgende = () => `voorstel-${++volgnummer}`;
 
-  // 1. Titel: leestekens weghalen (behalve eind-vraagteken)
+  // 1. Titel: alleen een afsluitend leesteken weghalen (behalve een eind-vraagteken).
+  // Een leesteken midden in de titel (bijv. tussen 2 zinnen) laten we staan: dat
+  // zomaar weghalen plakt de zinnen aan elkaar. Zie analyseerTitelLeestekens().
   if (titel) {
-    const zonderVraagteken = titel.replace(/\?\s*$/, "");
-    if (/[.,;:!]/.test(zonderVraagteken)) {
+    const analyse = analyseerTitelLeestekens(titel);
+    if (analyse && analyse.alleenAfsluitend) {
       voorstellen.push({
-        id: volgende(), veld: "titel", zoek: titel, vervang: verwijderLeestekensTitel(titel),
-        omschrijving: "Leestekens uit de titel gehaald (een eventueel vraagteken aan het eind blijft staan)."
+        id: volgende(), veld: "titel", zoek: titel, vervang: analyse.opgeschoond,
+        omschrijving: "Afsluitend leesteken uit de titel gehaald (een eventueel vraagteken aan het eind blijft staan)."
       });
     }
   }
