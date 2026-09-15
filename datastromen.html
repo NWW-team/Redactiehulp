@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Datastromen — Redactiehulp</title>
+<style>
+  :root{
+    color-scheme: light;
+    --blauw:#154273; --blauw-l:#e8f0f8; --blauw-r:#c7d9ea;
+    --ink:#101828; --sub:#344054; --mut:#667085;
+    --rand:#e4e7ec; --bg:#f6f7f9; --kaart:#ffffff;
+    --db:#6941c6;   --db-bg:#f6f3ff;   --db-r:#d8ccff;
+    --tmp:#475467;  --tmp-bg:#f2f4f7;  --tmp-r:#dfe3e8;
+    --ext:#067647;  --ext-bg:#ecfdf3;  --ext-r:#b7ecc9;
+    --keuze:#b54708;--keuze-bg:#fffaeb;--keuze-r:#fedf89;
+    --schaduw:0 1px 2px rgba(16,24,40,.06), 0 1px 3px rgba(16,24,40,.05);
+  }
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-size:15px; line-height:1.6;
+  }
+  .wrap{max-width:1180px; margin:0 auto; padding:0 20px 80px;}
+  a{color:var(--blauw);}
+
+  /* ---------- kop ---------- */
+  header.top{
+    background:linear-gradient(160deg,#154273 0%,#1d5a99 100%);
+    color:#fff; padding:44px 0 40px; margin-bottom:28px;
+  }
+  header.top .wrap{padding-bottom:0;}
+  .kicker{font-size:.78rem; letter-spacing:.12em; text-transform:uppercase; opacity:.8; margin:0 0 8px;}
+  header.top h1{font-size:clamp(1.6rem,4vw,2.3rem); line-height:1.2; margin:0 0 10px; font-weight:700;}
+  header.top p.lead{margin:0; max-width:62ch; font-size:1.02rem; opacity:.94;}
+  .bronnen{
+    margin-top:22px; display:flex; flex-wrap:wrap; gap:8px;
+  }
+  .bronnen span{
+    background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.28);
+    border-radius:999px; padding:4px 12px; font-size:.8rem;
+  }
+
+  /* ---------- secties ---------- */
+  section{margin:44px 0 0;}
+  h2{
+    font-size:1.28rem; margin:0 0 6px; letter-spacing:-.01em;
+    display:flex; align-items:baseline; gap:12px; flex-wrap:wrap;
+  }
+  h2 .nr{
+    font-size:.72rem; font-weight:700; letter-spacing:.1em; color:var(--blauw);
+    background:var(--blauw-l); border:1px solid var(--blauw-r);
+    border-radius:6px; padding:3px 8px; text-transform:uppercase;
+  }
+  h3{font-size:1.02rem; margin:26px 0 8px;}
+  .inleiding{color:var(--sub); max-width:78ch; margin:0 0 18px;}
+  .kader{
+    background:var(--kaart); border:1px solid var(--rand); border-radius:14px;
+    padding:20px 22px; box-shadow:var(--schaduw);
+  }
+  .let-op{
+    background:var(--keuze-bg); border:1px solid var(--keuze-r); border-left:5px solid var(--keuze);
+    border-radius:10px; padding:14px 18px; margin:18px 0; font-size:.94rem; color:#6c3a04;
+  }
+  .let-op strong{color:#7a3d02;}
+
+  /* ---------- pillen ---------- */
+  .pil{
+    display:inline-flex; align-items:center; gap:6px; white-space:nowrap;
+    border-radius:999px; padding:3px 10px; font-size:.76rem; font-weight:600;
+    border:1px solid transparent;
+  }
+  .pil-db{background:var(--db-bg); color:var(--db); border-color:var(--db-r);}
+  .pil-tijdelijk{background:var(--tmp-bg); color:var(--tmp); border-color:var(--tmp-r);}
+  .pil-extern{background:var(--ext-bg); color:var(--ext); border-color:var(--ext-r);}
+  .pil-keuze{background:var(--keuze-bg); color:var(--keuze); border-color:var(--keuze-r);}
+  .pil-st{background:#fff; color:var(--sub); border-color:var(--rand); font-weight:600;}
+  .pil-st.gebouwd{color:#067647; border-color:var(--ext-r); background:var(--ext-bg);}
+  .pil-st.strategie{color:var(--blauw); border-color:var(--blauw-r); background:var(--blauw-l);}
+  .pil-st.idee{color:var(--mut); border-color:var(--rand); background:#fafbfc;}
+  .pil-st.aanname{color:var(--keuze); border-color:var(--keuze-r); background:var(--keuze-bg);}
+
+  /* ---------- legenda ---------- */
+  .legenda{display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:14px;}
+  .leg-item{display:flex; gap:12px; align-items:flex-start;}
+  .leg-swatch{
+    flex:0 0 18px; height:18px; border-radius:5px; margin-top:3px; border:1.5px solid;
+  }
+  .sw-db{background:var(--db-bg); border-color:var(--db);}
+  .sw-tijdelijk{background:var(--tmp-bg); border-color:var(--tmp);}
+  .sw-extern{background:var(--ext-bg); border-color:var(--ext);}
+  .sw-keuze{background:var(--keuze-bg); border-color:var(--keuze); border-style:dashed;}
+  .sw-proces{background:#fff; border-color:var(--blauw);}
+  .sw-actor{background:#eef1f5; border-color:#98a2b3;}
+  .leg-item b{display:block; font-size:.9rem;}
+  .leg-item span{font-size:.85rem; color:var(--mut); line-height:1.45;}
+
+  /* ---------- werkbalk ---------- */
+  .werkbalk{
+    position:sticky; top:0; z-index:40; margin:0 0 20px;
+    background:rgba(255,255,255,.92); backdrop-filter:blur(8px);
+    border:1px solid var(--rand); border-radius:14px; padding:12px 14px;
+    box-shadow:var(--schaduw);
+    display:flex; flex-wrap:wrap; gap:14px; align-items:center; justify-content:space-between;
+  }
+  .filters{display:flex; flex-wrap:wrap; gap:8px; align-items:center;}
+  .filters .kop{font-size:.78rem; font-weight:700; color:var(--mut); text-transform:uppercase; letter-spacing:.06em; margin-right:2px;}
+  .chip{
+    font:inherit; font-size:.85rem; font-weight:600; cursor:pointer;
+    background:#fff; color:var(--sub); border:1px solid var(--rand);
+    border-radius:999px; padding:6px 13px; display:inline-flex; gap:7px; align-items:center;
+  }
+  .chip:hover{border-color:#b8c0cc;}
+  .chip .telling{font-weight:700; font-size:.76rem; color:var(--mut); background:var(--bg); border-radius:999px; padding:1px 7px;}
+  .chip[aria-pressed="true"]{background:var(--blauw); color:#fff; border-color:var(--blauw);}
+  .chip[aria-pressed="true"] .telling{background:rgba(255,255,255,.22); color:#fff;}
+  .chip.c-db[aria-pressed="true"]{background:var(--db); border-color:var(--db);}
+  .chip.c-geen[aria-pressed="true"]{background:var(--ext); border-color:var(--ext);}
+  .chip.c-keuze[aria-pressed="true"]{background:var(--keuze); border-color:var(--keuze);}
+  .schakelaars{display:flex; gap:10px; align-items:center; flex-wrap:wrap;}
+  .schakel{
+    font:inherit; font-size:.85rem; font-weight:600; cursor:pointer;
+    background:#fff; border:1px solid var(--rand); border-radius:10px; padding:6px 12px;
+    display:inline-flex; gap:9px; align-items:center; color:var(--sub);
+  }
+  .schakel .lamp{
+    width:30px; height:17px; border-radius:999px; background:#d0d5dd; position:relative; transition:background .15s;
+  }
+  .schakel .lamp::after{
+    content:""; position:absolute; top:2px; left:2px; width:13px; height:13px; border-radius:50%;
+    background:#fff; transition:transform .15s;
+  }
+  .schakel[aria-pressed="true"]{border-color:var(--db); color:var(--db); background:var(--db-bg);}
+  .schakel[aria-pressed="true"] .lamp{background:var(--db);}
+  .schakel[aria-pressed="true"] .lamp::after{transform:translateX(13px);}
+  .selectie-melding{
+    display:none; margin:0 0 16px; font-size:.9rem;
+    background:var(--blauw-l); border:1px solid var(--blauw-r); border-radius:10px;
+    padding:10px 14px; color:var(--blauw); align-items:center; gap:12px; justify-content:space-between;
+  }
+  .selectie-melding.aan{display:flex; flex-wrap:wrap;}
+  .selectie-melding button{
+    font:inherit; font-size:.82rem; font-weight:700; cursor:pointer; color:var(--blauw);
+    background:#fff; border:1px solid var(--blauw-r); border-radius:8px; padding:4px 11px;
+  }
+
+  /* ---------- diagram ---------- */
+  .diagram-doos{
+    background:var(--kaart); border:1px solid var(--rand); border-radius:14px;
+    box-shadow:var(--schaduw); padding:10px; margin:0 0 10px; overflow-x:auto;
+  }
+  .diagram-doos svg{display:block; width:100%; height:auto; min-width:1040px;}
+  .veeg-hint{font-size:.82rem; color:var(--mut); margin:0 0 20px;}
+  svg text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  .n-titel{font-size:14px; font-weight:700; fill:var(--ink);}
+  .n-regel{font-size:11.5px; fill:var(--sub);}
+  .n-mut{font-size:11px; fill:var(--mut);}
+  .n-cat{font-size:9.5px; font-weight:700; letter-spacing:.09em;}
+  .e-label{font-size:11.5px; fill:var(--sub);}
+  .e-label.klein{font-size:11px;}
+  .crudlabel{font-size:10.5px; font-weight:700; fill:var(--db); letter-spacing:.02em;}
+  .crudlabel.geen{fill:#8a94a6;}
+  .crudlabel.extern{fill:var(--ext);}
+  .crudlabel.browser{fill:var(--keuze);}
+  .appbox{fill:#fcfdff; stroke:var(--blauw); stroke-width:1.6; stroke-dasharray:7 5; opacity:1;}
+  .appbox-titel{font-size:13.5px; font-weight:700; fill:var(--blauw);}
+  .appbox-sub{font-size:11.5px; fill:var(--mut); font-style:italic;}
+  .node rect{stroke-width:1.6;}
+  .k-actor rect{fill:#eef1f5; stroke:#98a2b3;}
+  .k-actor .n-cat{fill:#667085;}
+  .k-proces rect{fill:#fff; stroke:var(--blauw);}
+  .k-proces .n-cat{fill:var(--blauw);}
+  .k-veld rect{fill:var(--tmp-bg); stroke:var(--tmp);}
+  .k-veld .n-cat{fill:var(--tmp);}
+  .k-extern rect{fill:var(--ext-bg); stroke:var(--ext);}
+  .k-extern .n-cat{fill:var(--ext);}
+  .k-opslag rect{fill:var(--db-bg); stroke:var(--db); stroke-dasharray:7 5;}
+  .k-opslag .n-cat{fill:var(--db);}
+  .k-keuze rect{fill:var(--keuze-bg); stroke:var(--keuze); stroke-dasharray:6 5;}
+  .k-keuze .n-cat{fill:var(--keuze);}
+  .e-lijn{fill:none; stroke:#475467; stroke-width:1.8;}
+  .e-lijn.zacht{stroke:#98a2b3; stroke-dasharray:7 5;}
+  .e-lijn.db{stroke:var(--db); stroke-dasharray:7 5;}
+  .e-lijn.keuze{stroke:var(--keuze); stroke-dasharray:6 5;}
+  .node, .edge{transition:opacity .18s ease;}
+  .diagram.dimmen .node:not(.aan), .diagram.dimmen .edge:not(.aan){opacity:.11;}
+  body.crud-uit .crudlabel{display:none;}
+  body.crud-uit .crudrij{display:none;}
+  body.crud-uit th.crud-kolom, body.crud-uit td.crud{display:none;}
+
+  /* ---------- kaarten ---------- */
+  .kaarten{display:grid; gap:16px;}
+  .kaart{
+    background:var(--kaart); border:1px solid var(--rand); border-left:5px solid var(--tmp);
+    border-radius:12px; padding:18px 20px; box-shadow:var(--schaduw);
+  }
+  .kaart[data-opslag="db"]{border-left-color:var(--db);}
+  .kaart[data-opslag="tijdelijk"]{border-left-color:var(--tmp);}
+  .kaart[data-opslag="extern"]{border-left-color:var(--ext);}
+  .kaart[data-opslag="keuze"]{border-left-color:var(--keuze);}
+  .kaart.gekozen{box-shadow:0 0 0 3px rgba(21,66,115,.18); border-color:var(--blauw-r);}
+  .kaart-kop{display:flex; gap:12px; flex-wrap:wrap; align-items:flex-start; justify-content:space-between;}
+  .kaart-kop h3{margin:0; font-size:1rem; line-height:1.35; max-width:44ch;}
+  .kaart-kop .nummer{color:var(--mut); font-weight:700; font-size:.8rem; margin-right:6px;}
+  .kaart-pillen{display:flex; gap:6px; flex-wrap:wrap;}
+  .route{
+    display:flex; gap:10px; align-items:stretch; margin:16px 0 0; flex-wrap:wrap;
+  }
+  .stap{
+    flex:1 1 210px; background:var(--bg); border:1px solid var(--rand); border-radius:10px; padding:10px 12px;
+    font-size:.87rem; color:var(--sub);
+  }
+  .stap b{
+    display:block; font-size:.7rem; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--mut); margin-bottom:3px; font-weight:700;
+  }
+  .stap code{font-size:.82rem; background:#eceff3; border-radius:4px; padding:1px 4px;}
+  .pijl{
+    flex:0 0 18px; display:flex; align-items:center; justify-content:center;
+    color:var(--blauw); font-weight:700; font-size:1.1rem;
+  }
+  .crudrij{display:flex; gap:8px; flex-wrap:wrap; margin:14px 0 0;}
+  .crudchip{
+    font-size:.79rem; border-radius:8px; padding:4px 10px; border:1px solid;
+    display:inline-flex; gap:7px; align-items:center;
+  }
+  .crudchip b{font-weight:800; font-size:.82rem;}
+  .crudchip.k-db{background:var(--db-bg); border-color:var(--db-r); color:#55309e;}
+  .crudchip.k-geen{background:var(--tmp-bg); border-color:var(--tmp-r); color:var(--tmp);}
+  .crudchip.k-extern{background:var(--ext-bg); border-color:var(--ext-r); color:#046c40;}
+  .crudchip.k-browser{background:var(--keuze-bg); border-color:var(--keuze-r); color:#8a3a06;}
+  dl.detail{
+    display:grid; grid-template-columns:minmax(120px,168px) 1fr; gap:2px 18px;
+    margin:16px 0 0; font-size:.89rem;
+  }
+  dl.detail dt{
+    font-weight:700; color:var(--mut); font-size:.78rem; text-transform:uppercase; letter-spacing:.05em;
+    padding-top:6px; border-top:1px solid var(--rand);
+  }
+  dl.detail dd{margin:0; padding-top:6px; border-top:1px solid var(--rand); color:var(--sub);}
+  dl.detail dd.vraag{color:#7a3d02; background:var(--keuze-bg); border-radius:0 6px 6px 0;}
+  dl.detail dt.vraag{color:var(--keuze);}
+  .kaart-acties{margin:16px 0 0; display:flex; gap:10px; flex-wrap:wrap;}
+  .knop{
+    font:inherit; font-size:.84rem; font-weight:600; cursor:pointer;
+    background:#fff; color:var(--blauw); border:1px solid var(--blauw-r); border-radius:9px; padding:6px 13px;
+  }
+  .knop:hover{background:var(--blauw-l);}
+  .knop[aria-pressed="true"]{background:var(--blauw); color:#fff; border-color:var(--blauw);}
+  .leeg{
+    display:none; background:var(--kaart); border:1px dashed var(--rand); border-radius:12px;
+    padding:22px; color:var(--mut); text-align:center;
+  }
+
+  /* ---------- matrix ---------- */
+  .tabel-doos{
+    background:var(--kaart); border:1px solid var(--rand); border-radius:14px;
+    box-shadow:var(--schaduw); overflow-x:auto;
+  }
+  table{border-collapse:collapse; width:100%; min-width:1120px; font-size:.85rem;}
+  thead th{
+    background:var(--blauw); color:#fff; text-align:left; font-size:.75rem; font-weight:700;
+    letter-spacing:.05em; text-transform:uppercase; padding:11px 12px; vertical-align:bottom;
+  }
+  tbody td{padding:11px 12px; border-top:1px solid var(--rand); vertical-align:top; color:var(--sub);}
+  tbody tr:nth-child(even) td{background:#fbfcfd;}
+  tbody tr.gekozen td{background:var(--blauw-l);}
+  tbody tr{cursor:pointer;}
+  tbody tr:hover td{background:#f2f6fa;}
+  td.gegeven{font-weight:700; color:var(--ink); min-width:170px;}
+  td.gegeven .pil{margin-top:5px; font-size:.7rem;}
+  td.crud{min-width:210px;}
+  td.crud .cl{display:block; font-size:.78rem; margin-bottom:2px;}
+  td.crud .cl b{font-weight:800;}
+  td.crud .cl.k-db{color:#55309e;}
+  td.crud .cl.k-geen{color:var(--mut);}
+  td.crud .cl.k-extern{color:#046c40;}
+  td.crud .cl.k-browser{color:#8a3a06;}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:.85em;}
+
+  /* ---------- voorstel ---------- */
+  .voorstel{
+    background:linear-gradient(170deg,#ffffff 0%,#f4f8fc 100%);
+    border:1px solid var(--blauw-r); border-radius:16px; padding:26px 26px 8px;
+    box-shadow:var(--schaduw);
+  }
+  .conclusie{
+    background:var(--ext-bg); border:1px solid var(--ext-r); border-left:5px solid var(--ext);
+    border-radius:10px; padding:16px 20px; margin:0 0 22px; font-size:1rem; color:#04543a;
+  }
+  .voorstel h3{margin-top:26px;}
+  .voorstel ul{margin:8px 0 0; padding-left:22px;}
+  .voorstel li{margin-bottom:7px; color:var(--sub);}
+  .voorstel li b{color:var(--ink);}
+  ol.keuzes{margin:8px 0 0; padding-left:22px;}
+  ol.keuzes li{margin-bottom:12px; color:var(--sub);}
+  ol.keuzes li b{display:block; color:var(--ink);}
+  .veld-tabel{width:100%; min-width:0; border-collapse:collapse; margin-top:10px; font-size:.86rem;}
+  .veld-tabel th{
+    background:var(--db-bg); color:#55309e; border:1px solid var(--db-r); text-align:left;
+    padding:8px 10px; font-size:.75rem; text-transform:uppercase; letter-spacing:.05em; position:static;
+  }
+  .veld-tabel td{border:1px solid var(--rand); padding:8px 10px; color:var(--sub);}
+  .veld-tabel code{background:#f4f0ff; border-radius:4px; padding:1px 5px; color:#55309e;}
+  footer.eind{
+    margin-top:44px; padding-top:20px; border-top:1px solid var(--rand);
+    font-size:.84rem; color:var(--mut);
+  }
+  footer.eind p{margin:6px 0;}
+
+  /* ---------- klein scherm ---------- */
+  @media (max-width:760px){
+    .wrap{padding:0 14px 60px;}
+    header.top{padding:32px 0 28px;}
+    .werkbalk{border-radius:0 0 14px 14px; padding:9px 10px; gap:8px;}
+    .filters .kop{display:none;}
+    .filters{gap:6px;}
+    .chip{font-size:.78rem; padding:5px 10px; gap:5px;}
+    .mob-verberg{display:none;}
+    .chip .telling{font-size:.72rem; padding:1px 6px;}
+    .schakel{font-size:.78rem; padding:5px 10px;}
+    .route{flex-direction:column; gap:6px;}
+    .stap{flex:0 0 auto;}
+    .pijl{transform:rotate(90deg); height:16px; flex:0 0 16px;}
+    dl.detail{grid-template-columns:1fr; gap:0;}
+    dl.detail dt{border-top:1px solid var(--rand); padding-top:8px;}
+    dl.detail dd{border-top:0; padding-top:2px; padding-bottom:6px;}
+    dl.detail dd.vraag{border-radius:6px; padding:6px 8px; margin-bottom:6px;}
+    .voorstel{padding:20px 16px 6px;}
+    .kaart{padding:16px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <p class="kicker">NederlandWereldwijd · Redactiehulp</p>
+    <h1>Datastromen van de Redactiehulp</h1>
+    <p class="lead">
+      Waar komen de gegevens vandaan, wat gebeurt ermee, waar gaan ze naartoe — en wat moet er écht
+      duurzaam bewaard worden? Gebaseerd op de code die er nu staat (<code>index.html</code>) en op de
+      drie sporen uit <code>strategy.md</code>: Regelkennis, Schrijfskills en Kwaliteitscontrole.
+    </p>
+    <div class="bronnen">
+      <span>Bron: index.html (werkende demo)</span>
+      <span>Bron: strategy.md (14 sep 2026)</span>
+      <span>Bron: README.md</span>
+      <span>Alle voorbeeldwaarden zijn fictief</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="let-op">
+    <strong>Twee dingen vooraf.</strong>
+    (1) De regelset in <code>index.html</code> is een <strong>fictieve placeholderregelset</strong>, niet de
+    officiële NWW-schrijfwijzer — dat staat zo in de code en in de README. (2) De app doet op dit moment
+    <strong>nul netwerkverzoeken en gebruikt geen enkele vorm van opslag</strong>: geen database, geen cookies,
+    geen <code>localStorage</code>. Gecontroleerd in de code: er komt geen <code>fetch</code>,
+    <code>localStorage</code>, <code>sessionStorage</code> of <code>document.cookie</code> in voor. De enige
+    uitgaande route is het klembord, en alleen nadat de redacteur zelf op &laquo;Kopieer prompt&raquo; klikt.
+  </div>
+
+  <div class="werkbalk">
+    <div class="filters" role="group" aria-label="Filter op opslagcategorie">
+      <span class="kop">Filter</span>
+      <button class="chip c-alle" data-filter="alle" data-naam="Alle data" aria-pressed="true">Alle data <span class="telling" data-telling="alle"></span></button>
+      <button class="chip c-db" data-filter="db" data-naam="Databaseopslag" aria-pressed="false">🗄 Databaseopslag <span class="telling" data-telling="db"></span></button>
+      <button class="chip c-geen" data-filter="geen" data-naam="Geen eigen databaseopslag" aria-pressed="false"><span>↯ Geen<span class="mob-verberg"> eigen</span> databaseopslag</span> <span class="telling" data-telling="geen"></span></button>
+      <button class="chip c-keuze" data-filter="keuze" data-naam="Keuze nodig" aria-pressed="false">❓ Keuze nodig <span class="telling" data-telling="keuze"></span></button>
+    </div>
+    <div class="schakelaars">
+      <button class="schakel" id="crud-schakel" aria-pressed="true">
+        <span class="lamp" aria-hidden="true"></span> <span id="crud-tekst">CRUD-labels: aan</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="selectie-melding" id="selectie-melding">
+    <span id="selectie-tekst"></span>
+    <button type="button" id="selectie-wis">Toon weer alles</button>
+  </div>
+
+  <!-- ============================ DIAGRAM 1 ============================ -->
+  <section id="diagram">
+    <h2><span class="nr">Stap 1</span> Datastromen tijdens het werken met de app</h2>
+    <p class="inleiding">
+      Eén werksessie van een redacteur, van links naar rechts en van boven naar beneden. Op elke pijl staat
+      <em>welke gegevens</em> er stromen. Alles binnen de gestippelde blauwe kader gebeurt in de browser van de
+      redacteur; daarbuiten zijn het mensen, het besturingssysteem of externe diensten.
+    </p>
+
+    <div class="diagram-doos">
+      <svg viewBox="0 0 1560 1380" role="img" aria-labelledby="d1-titel d1-desc">
+        <title id="d1-titel">Datastromen van de Redactiehulp tijdens gebruik</title>
+        <desc id="d1-desc">De redacteur voert titel, introductie en hoofdtekst in de statische pagina index.html in.
+        De regelcheck-engine, de promptgenerator en de voor-na-vergelijking gebruiken dezelfde invoer en slaan niets op.
+        De prompt gaat via het klembord naar Claude.ai; de herschreven tekst komt via het klembord terug in het veld
+        ai-output. Alleen de uitkomst van de vergelijking is voorgesteld om duurzaam op te slaan.</desc>
+        <defs>
+          <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#475467"/></marker>
+          <marker id="ah-zacht" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#98a2b3"/></marker>
+          <marker id="ah-db" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6941c6"/></marker>
+          <marker id="ah-keuze" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b54708"/></marker>
+        </defs>
+
+        <g class="diagram" id="diagram1">
+
+          <!-- app-omhulsel -->
+          <rect class="appbox" x="300" y="90" width="470" height="1210" rx="18"/>
+          <text class="appbox-titel" x="316" y="112">Redactiehulp — index.html (in de browser)</text>
+          <text class="appbox-sub" x="316" y="1288">100% client-side · geen backend · geen login · geen opslag</text>
+
+          <!-- knopen -->
+          <g class="node k-actor" id="n-redacteur">
+            <rect x="40" y="80" width="210" height="100" rx="12"/>
+            <text class="n-titel" x="145" y="118" text-anchor="middle">Redacteur</text>
+            <text class="n-regel" x="145" y="138" text-anchor="middle">NederlandWereldwijd</text>
+            <text class="n-mut" x="145" y="156" text-anchor="middle">mens · eindredacteur</text>
+            <text class="n-cat" x="145" y="173" text-anchor="middle">GEBRUIKER</text>
+          </g>
+
+          <g class="node k-veld" id="n-invoer">
+            <rect x="395" y="165" width="350" height="90" rx="10"/>
+            <text class="n-titel" x="570" y="190" text-anchor="middle">Invoervelden</text>
+            <text class="n-regel" x="570" y="209" text-anchor="middle">#titel · #intro · #hoofdtekst · #taak</text>
+            <text class="n-mut" x="570" y="226" text-anchor="middle">staat alleen in het formulier (DOM)</text>
+            <text class="n-cat" x="570" y="245" text-anchor="middle">TIJDELIJK</text>
+          </g>
+
+          <g class="node k-proces" id="n-regelcheck">
+            <rect x="395" y="315" width="350" height="90" rx="10"/>
+            <text class="n-titel" x="570" y="340" text-anchor="middle">Regelcheck-engine</text>
+            <text class="n-regel" x="570" y="359" text-anchor="middle">voerControleUit() · leest het RULES-blok</text>
+            <text class="n-mut" x="570" y="376" text-anchor="middle">rekent, bewaart niets</text>
+            <text class="n-cat" x="570" y="395" text-anchor="middle">VERWERKING</text>
+          </g>
+
+          <g class="node k-veld" id="n-scherm-check">
+            <rect x="395" y="465" width="350" height="80" rx="10"/>
+            <text class="n-titel" x="570" y="492" text-anchor="middle">Scherm: aandachtspunten</text>
+            <text class="n-regel" x="570" y="511" text-anchor="middle">#resultaten-invoer</text>
+            <text class="n-cat" x="570" y="531" text-anchor="middle">WEERGAVE · TIJDELIJK</text>
+          </g>
+
+          <g class="node k-proces" id="n-prompt">
+            <rect x="395" y="605" width="350" height="90" rx="10"/>
+            <text class="n-titel" x="570" y="630" text-anchor="middle">Promptgenerator</text>
+            <text class="n-regel" x="570" y="649" text-anchor="middle">genereerPrompt() → #prompt-output</text>
+            <text class="n-mut" x="570" y="666" text-anchor="middle">regeltitels + taak + tekst in één prompt</text>
+            <text class="n-cat" x="570" y="685" text-anchor="middle">VERWERKING</text>
+          </g>
+
+          <g class="node k-veld" id="n-aioutput">
+            <rect x="395" y="755" width="350" height="85" rx="10"/>
+            <text class="n-titel" x="570" y="782" text-anchor="middle">Herschreven tekst · #ai-output</text>
+            <text class="n-regel" x="570" y="801" text-anchor="middle">handmatig teruggeplakt uit Claude.ai</text>
+            <text class="n-cat" x="570" y="826" text-anchor="middle">TIJDELIJK</text>
+          </g>
+
+          <g class="node k-proces" id="n-vergelijk">
+            <rect x="395" y="900" width="350" height="90" rx="10"/>
+            <text class="n-titel" x="570" y="925" text-anchor="middle">Voor/na-vergelijking</text>
+            <text class="n-regel" x="570" y="944" text-anchor="middle">vergelijk() · telt aandachtspunten</text>
+            <text class="n-mut" x="570" y="961" text-anchor="middle">fictief: vóór 7 → na 1</text>
+            <text class="n-cat" x="570" y="980" text-anchor="middle">VERWERKING</text>
+          </g>
+
+          <g class="node k-veld" id="n-scherm-verg">
+            <rect x="395" y="1050" width="350" height="80" rx="10"/>
+            <text class="n-titel" x="570" y="1077" text-anchor="middle">Scherm: voor/na</text>
+            <text class="n-regel" x="570" y="1096" text-anchor="middle">#resultaten-vergelijking</text>
+            <text class="n-cat" x="570" y="1116" text-anchor="middle">WEERGAVE · TIJDELIJK</text>
+          </g>
+
+          <g class="node k-keuze" id="n-localstorage">
+            <rect x="395" y="1190" width="350" height="75" rx="10"/>
+            <text class="n-titel" x="570" y="1214" text-anchor="middle">localStorage (browseropslag)</text>
+            <text class="n-regel" x="570" y="1232" text-anchor="middle">concept bewaren — NIET GEBOUWD</text>
+            <text class="n-cat" x="570" y="1253" text-anchor="middle">KEUZE NODIG · BROWSEROPSLAG = OPSLAG</text>
+          </g>
+
+          <g class="node k-extern" id="n-klembord">
+            <rect x="950" y="610" width="230" height="85" rx="10"/>
+            <text class="n-titel" x="1065" y="637" text-anchor="middle">Klembord</text>
+            <text class="n-regel" x="1065" y="656" text-anchor="middle">besturingssysteem</text>
+            <text class="n-cat" x="1065" y="681" text-anchor="middle">BUITEN DE APP</text>
+          </g>
+
+          <g class="node k-extern" id="n-claude">
+            <rect x="950" y="380" width="230" height="115" rx="10"/>
+            <text class="n-titel" x="1065" y="406" text-anchor="middle">Claude.ai</text>
+            <text class="n-regel" x="1065" y="425" text-anchor="middle">extern (Anthropic)</text>
+            <text class="n-mut" x="1065" y="442" text-anchor="middle">doet het eigenlijke (her)schrijven</text>
+            <text class="n-mut" x="1065" y="458" text-anchor="middle">chat blijft daar staan</text>
+            <text class="n-cat" x="1065" y="481" text-anchor="middle">EXTERNE DIENST</text>
+          </g>
+
+          <g class="node k-extern" id="n-cms">
+            <rect x="1330" y="380" width="200" height="130" rx="10"/>
+            <text class="n-titel" x="1430" y="408" text-anchor="middle">NWW-website</text>
+            <text class="n-regel" x="1430" y="427" text-anchor="middle">CMS · buiten de app</text>
+            <text class="n-mut" x="1430" y="444" text-anchor="middle">bron van waarheid voor</text>
+            <text class="n-mut" x="1430" y="459" text-anchor="middle">gepubliceerde tekst</text>
+            <text class="n-cat" x="1430" y="480" text-anchor="middle">EXTERNE BRON</text>
+            <text class="n-cat" x="1430" y="499" text-anchor="middle" fill="#b54708">⚠ AANNAME</text>
+          </g>
+
+          <g class="node k-opslag" id="n-db">
+            <rect x="950" y="1120" width="420" height="160" rx="12"/>
+            <text class="n-titel" x="1160" y="1150" text-anchor="middle">Eigen database · tabel kwaliteitsmeting</text>
+            <text class="n-regel" x="1160" y="1170" text-anchor="middle">ADVIES — nog niet gebouwd</text>
+            <text class="n-mut" x="1160" y="1192" text-anchor="middle">id · datum · taaksoort · aantal_voor · aantal_na</text>
+            <text class="n-mut" x="1160" y="1208" text-anchor="middle">regel_ids · regelset_versie</text>
+            <text class="n-mut" x="1160" y="1230" text-anchor="middle">fictief: 2026-09-15 · herschrijven · 7 → 1</text>
+            <text class="n-mut" x="1160" y="1246" text-anchor="middle">géén paginatekst, géén namen</text>
+            <text class="n-cat" x="1160" y="1268" text-anchor="middle">DATABASEOPSLAG</text>
+          </g>
+
+          <!-- pijlen -->
+          <g class="edge" id="e-red-invoer">
+            <path class="e-lijn" d="M250,140 H648 V158" marker-end="url(#ah)"/>
+            <text class="e-label" x="262" y="131">titel · introductie · hoofdtekst · taakkeuze</text>
+          </g>
+
+          <g class="edge" id="e-bus-regelcheck">
+            <path class="e-lijn" d="M395,230 H364 V360 H387" marker-end="url(#ah)"/>
+          </g>
+          <g class="edge" id="e-bus-prompt">
+            <path class="e-lijn" d="M395,215 H348 V650 H387" marker-end="url(#ah)"/>
+          </g>
+          <g class="edge" id="e-bus-vergelijk">
+            <path class="e-lijn" d="M395,200 H332 V945 H387" marker-end="url(#ah)"/>
+          </g>
+          <g class="edge" id="e-bus-localstorage">
+            <path class="e-lijn keuze" d="M395,185 H316 V1227 H387" marker-end="url(#ah-keuze)"/>
+          </g>
+          <text class="e-label" transform="rotate(-90 380 770)" x="380" y="770" text-anchor="middle">invoergegevens — dezelfde velden naar alle vier de takken</text>
+
+          <g class="edge" id="e-check-scherm">
+            <path class="e-lijn" d="M570,405 V459" marker-end="url(#ah)"/>
+            <text class="e-label klein" x="580" y="428">aandachtspunten:</text>
+            <text class="e-label klein" x="580" y="443">regel · fragment · uitleg · bron</text>
+            <text class="crudlabel geen" x="556" y="441" text-anchor="end">◆ geen databaseactie</text>
+          </g>
+
+          <g class="edge" id="e-prompt-klembord">
+            <path class="e-lijn" d="M745,650 H942" marker-end="url(#ah)"/>
+            <text class="e-label klein" x="780" y="630">gegenereerde prompt</text>
+            <text class="e-label klein" x="780" y="644">regels + taak + tekst</text>
+            <text class="crudlabel geen" x="780" y="668">◆ geen databaseactie</text>
+          </g>
+
+          <g class="edge" id="e-klembord-claude">
+            <path class="e-lijn" d="M1005,610 V503" marker-end="url(#ah)"/>
+            <text class="e-label klein" x="996" y="540" text-anchor="end">redacteur plakt</text>
+            <text class="e-label klein" x="996" y="554" text-anchor="end">de prompt in Claude.ai</text>
+            <text class="crudlabel geen" x="996" y="570" text-anchor="end">◆ geen databaseactie</text>
+          </g>
+
+          <g class="edge" id="e-claude-klembord">
+            <path class="e-lijn" d="M1125,495 V602" marker-end="url(#ah)"/>
+            <text class="e-label klein" x="1135" y="540">herschreven tekst</text>
+            <text class="e-label klein" x="1135" y="554">uit Claude.ai</text>
+          </g>
+
+          <g class="edge" id="e-klembord-aioutput">
+            <path class="e-lijn" d="M990,695 V797 H753" marker-end="url(#ah)"/>
+            <text class="e-label klein" x="780" y="785">AI-tekst geplakt in #ai-output</text>
+          </g>
+
+          <g class="edge" id="e-aioutput-vergelijk">
+            <path class="e-lijn" d="M570,840 V894" marker-end="url(#ah)"/>
+            <text class="e-label klein" x="580" y="872">herschreven tekst</text>
+          </g>
+
+          <g class="edge" id="e-vergelijk-scherm">
+            <path class="e-lijn" d="M570,990 V1044" marker-end="url(#ah)"/>
+            <text class="e-label klein" x="580" y="1016">aantal aandachtspunten</text>
+            <text class="e-label klein" x="580" y="1031">vóór en na</text>
+          </g>
+
+          <g class="edge" id="e-vergelijk-db">
+            <path class="e-lijn db" d="M745,915 H830 V1176 H942" marker-end="url(#ah-db)"/>
+            <text class="e-label klein" x="845" y="1040">ADVIES — 1 regel per vergelijking:</text>
+            <text class="e-label klein" x="845" y="1056">datum · taaksoort · aantal vóór/na · regel-id&#39;s</text>
+            <text class="crudlabel" x="845" y="1076">◆ C — aanmaken in de eigen database</text>
+          </g>
+
+          <g class="edge" id="e-claude-cms">
+            <path class="e-lijn zacht" d="M1180,440 H1322" marker-end="url(#ah-zacht)"/>
+            <text class="e-label klein" x="1190" y="412">definitieve tekst</text>
+            <text class="e-label klein" x="1190" y="426">door de redacteur</text>
+            <text class="crudlabel extern" x="1190" y="456">◆ C/U — in het CMS</text>
+          </g>
+
+          <g class="edge" id="e-scherm-redacteur">
+            <path class="e-lijn zacht" d="M745,1090 H790 V1340 H170 V190" marker-end="url(#ah-zacht)"/>
+            <text class="e-label klein" transform="rotate(-90 156 770)" x="156" y="770" text-anchor="middle">resultaten gelezen op het scherm — niets bewaard</text>
+          </g>
+
+        </g>
+      </svg>
+    </div>
+    <p class="veeg-hint">Klein scherm? Veeg het diagram horizontaal, of gebruik de kaarten bij stap 2 — daar staat dezelfde informatie als tekst.</p>
+
+    <div class="kader">
+      <h3 style="margin-top:0">Legenda</h3>
+      <div class="legenda">
+        <div class="leg-item"><span class="leg-swatch sw-actor"></span><b>Gebruiker</b><span>Mens. Doet iets met de hand: typen, plakken, beslissen.</span></div>
+        <div class="leg-item"><span class="leg-swatch sw-proces"></span><b>Verwerking</b><span>Een functie in <code>index.html</code>. Rekent en toont; bewaart niets.</span></div>
+        <div class="leg-item"><span class="leg-swatch sw-tijdelijk"></span><b>Tijdelijk — mag weg</b><span>Nodig voor invoer, berekening of weergave. Bij herladen verdwenen.</span></div>
+        <div class="leg-item"><span class="leg-swatch sw-extern"></span><b>Staat al elders / extern</b><span>Bestaat al buiten de app. Niet automatisch naar een eigen database kopiëren.</span></div>
+        <div class="leg-item"><span class="leg-swatch sw-db"></span><b>Databaseopslag</b><span>Moet duurzaam in de eigen database. Gestippeld = nog niet gebouwd.</span></div>
+        <div class="leg-item"><span class="leg-swatch sw-keuze"></span><b>Keuze nodig</b><span>Twijfelgeval. Er hoort een vraag bij die we eerst moeten beantwoorden.</span></div>
+      </div>
+      <p style="margin:18px 0 0; font-size:.88rem; color:var(--mut);">
+        <strong>Over de pijlen:</strong> doorlopende lijn = gebouwd en automatisch. Gestippeld grijs = handmatige
+        stap of aanname. Gestippeld paars = voorgestelde opslag. Gestippeld oranje = keuze die nog open staat.
+        De vier takken linksonder de invoervelden vervoeren allemaal <em>dezelfde</em> gegevens (titel, introductie,
+        hoofdtekst, taak) naar respectievelijk de regelcheck, de promptgenerator, de vergelijking en de
+        nog-niet-gebouwde browseropslag. <strong>◆-labels</strong> zijn CRUD-labels; die kun je bovenaan uitzetten.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============================ DIAGRAM 2 ============================ -->
+  <section id="diagram-regelset">
+    <h2><span class="nr">Stap 1b</span> Hoe de regels in de app komen (buiten de werksessie om)</h2>
+    <p class="inleiding">
+      Dit is een andere levensloop dan hierboven: het gebeurt niet tijdens het werken met de app, maar bij het
+      bijwerken van het bestand. Belangrijk voor de opslagvraag, want de regelset — spoor <em>Regelkennis</em> —
+      is het gegeven waarvan je het snelst denkt &laquo;dat moet in een database&raquo;.
+    </p>
+
+    <div class="diagram-doos">
+      <svg viewBox="0 0 1220 440" role="img" aria-labelledby="d2-titel d2-desc">
+        <title id="d2-titel">Route van de schrijfwijzer naar de regelset in de app</title>
+        <desc id="d2-desc">Het schrijfwijzer-brondocument staat op SharePoint of Teams en wordt handmatig omgezet naar
+        check-functies in het RULES-blok van index.html. De regelcheck en de promptgenerator lezen die regels uit het
+        bestand. Er gaat een losse HTML-versie met de echte regelset rond buiten Git; daarvoor is een keuze nodig.</desc>
+        <defs>
+          <marker id="b-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#475467"/></marker>
+          <marker id="b-ah-zacht" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#98a2b3"/></marker>
+          <marker id="b-ah-keuze" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b54708"/></marker>
+        </defs>
+        <g class="diagram" id="diagram2">
+
+          <g class="node k-extern" id="n2-wijzer">
+            <rect x="30" y="120" width="240" height="150" rx="10"/>
+            <text class="n-titel" x="150" y="150" text-anchor="middle">Schrijfwijzer + huisstijl</text>
+            <text class="n-regel" x="150" y="169" text-anchor="middle">brondocument (Word/PDF)</text>
+            <text class="n-mut" x="150" y="186" text-anchor="middle">SharePoint / Teams / e-mail</text>
+            <text class="n-mut" x="150" y="202" text-anchor="middle">fictief: schrijfwijzer-v3.docx</text>
+            <text class="n-cat" x="150" y="224" text-anchor="middle">EXTERNE BRON</text>
+            <text class="n-mut" x="150" y="245" text-anchor="middle" font-style="italic">bewust niet in Git</text>
+          </g>
+
+          <g class="node k-extern" id="n2-rules">
+            <rect x="490" y="110" width="280" height="170" rx="10"/>
+            <text class="n-titel" x="630" y="142" text-anchor="middle">RULES-blok in index.html</text>
+            <text class="n-regel" x="630" y="161" text-anchor="middle">id · titel · categorie · bron · scope · check()</text>
+            <text class="n-mut" x="630" y="180" text-anchor="middle">nu: fictieve voorbeeldregelset,</text>
+            <text class="n-mut" x="630" y="196" text-anchor="middle">géén officiële NWW-schrijfwijzer</text>
+            <text class="n-mut" x="630" y="217" text-anchor="middle">5 voorbeeldregels + kop-lengte</text>
+            <text class="n-cat" x="630" y="243" text-anchor="middle">AL IN EEN BESTAND (Git)</text>
+          </g>
+
+          <g class="node k-proces" id="n2-engine">
+            <rect x="960" y="120" width="230" height="150" rx="10"/>
+            <text class="n-titel" x="1075" y="152" text-anchor="middle">Regelcheck +</text>
+            <text class="n-titel" x="1075" y="170" text-anchor="middle">promptgenerator</text>
+            <text class="n-regel" x="1075" y="190" text-anchor="middle">in de browser</text>
+            <text class="n-mut" x="1075" y="207" text-anchor="middle">leest de regels, bewaart niets</text>
+            <text class="n-cat" x="1075" y="232" text-anchor="middle">VERWERKING</text>
+          </g>
+
+          <g class="node k-keuze" id="n2-losse">
+            <rect x="490" y="320" width="280" height="100" rx="10"/>
+            <text class="n-titel" x="630" y="346" text-anchor="middle">Losse HTML met de échte regelset</text>
+            <text class="n-regel" x="630" y="365" text-anchor="middle">via Teams / e-mail / SharePoint</text>
+            <text class="n-mut" x="630" y="382" text-anchor="middle">buiten Git — geen versiebeheer</text>
+            <text class="n-cat" x="630" y="404" text-anchor="middle">KEUZE NODIG</text>
+          </g>
+
+          <g class="edge" id="e2-wijzer-rules">
+            <path class="e-lijn zacht" d="M270,195 H482" marker-end="url(#b-ah-zacht)"/>
+            <text class="e-label klein" x="282" y="168">regels handmatig omgezet naar</text>
+            <text class="e-label klein" x="282" y="182">check()-functies — buiten de app</text>
+            <text class="crudlabel geen" x="282" y="216">◆ geen databaseactie</text>
+          </g>
+
+          <g class="edge" id="e2-rules-engine">
+            <path class="e-lijn" d="M770,195 H952" marker-end="url(#b-ah)"/>
+            <text class="e-label klein" x="782" y="168">regelset gelezen bij</text>
+            <text class="e-label klein" x="782" y="182">elke controle</text>
+            <text class="crudlabel extern" x="782" y="216">◆ R — uit het bestand</text>
+          </g>
+
+          <g class="edge" id="e2-rules-losse">
+            <path class="e-lijn keuze" d="M630,280 V312" marker-end="url(#b-ah-keuze)"/>
+            <text class="e-label klein" x="642" y="302">zelfde app, andere regelset</text>
+          </g>
+
+        </g>
+      </svg>
+    </div>
+    <p class="veeg-hint">Kern: de regelset stáát al in een bestand. Dat bestand is de release. Een database ernaast
+      zou een tweede waarheid maken, zonder dat iemand er iets aan heeft.</p>
+  </section>
+
+  <!-- ============================ KAARTEN ============================ -->
+  <section id="gegevens">
+    <h2><span class="nr">Stap 2</span> Per gegeven: bewaren, weggooien of staat het al elders?</h2>
+    <p class="inleiding">
+      Elke kaart volgt één gegeven of één handeling van bron naar bestemming, en zegt wat er na afsluiten of
+      herladen moet blijven bestaan. <strong>Nu</strong> is wat er vandaag in <code>index.html</code> gebeurt;
+      <strong>advies</strong> is wat ik zou doen. Klik op &laquo;Toon route in het diagram&raquo; om de volledige
+      route van dat gegeven hierboven op te lichten.
+    </p>
+    <div class="kaarten" id="kaarten"></div>
+    <div class="leeg" id="kaarten-leeg">Geen gegevens in dit filter.</div>
+  </section>
+
+  <!-- ============================ MATRIX ============================ -->
+  <section id="matrix">
+    <h2><span class="nr">Stap 3</span> Matrix: bron → verwerking → bestemming, met CRUD</h2>
+    <p class="inleiding">
+      Dezelfde gegevens en dezelfde keuzes als in het diagram en de kaarten, compact naast elkaar. De kolom CRUD
+      zegt ook <em>waar</em> de actie gebeurt. Alleen transport, berekening of weergave krijgt
+      &laquo;geen databaseactie&raquo; — dat is geen tekortkoming, dat is het punt. Klik een regel aan om de route
+      in het diagram te zien.
+    </p>
+    <div class="tabel-doos">
+      <table>
+        <thead>
+          <tr>
+            <th>Gegeven / handeling</th>
+            <th>Bron</th>
+            <th>Verwerking</th>
+            <th>Bestemming</th>
+            <th class="crud-kolom">CRUD + waar</th>
+            <th>Opslagkeuze</th>
+            <th>Reden</th>
+            <th>Na herladen</th>
+          </tr>
+        </thead>
+        <tbody id="matrix-body"></tbody>
+      </table>
+    </div>
+    <p class="veeg-hint">Veeg de tabel horizontaal voor de laatste kolommen.</p>
+  </section>
+
+  <!-- ============================ VOORSTEL ============================ -->
+  <section id="voorstel">
+    <h2><span class="nr">Stap 4</span> Voorstel: wat moet je bewaren?</h2>
+    <div class="voorstel">
+
+      <div class="conclusie">
+        <strong>Voor wat de app vandaag doet heb je geen database nodig. Nul.</strong>
+        De Redactiehulp is één statisch bestand dat tekst controleert, een prompt bouwt en twee uitkomsten naast
+        elkaar zet. Alle gegevens die daarbij ontstaan zijn óf invoer van de redacteur, óf een berekening die je
+        met één klik opnieuw maakt, óf ze staan al ergens anders (de schrijfwijzer, Claude.ai, het CMS).
+        Bouw dus nu geen database.
+      </div>
+
+      <h3>Minimale opslag — en alleen als je écht gaat meten</h3>
+      <p style="margin:6px 0 0; color:var(--sub);">
+        Eén ding uit de strategie kán niet zonder opslag: spoor <strong>Kwaliteitscontrole</strong> wil
+        &laquo;controleren en meten of de output aan de regels voldoet&raquo;. Meten betekent vergelijken over tijd,
+        en dat kan niet als elke uitkomst na één keer F5 verdwenen is. Dat is precies één tabel met zeven kolommen:
+      </p>
+      <table class="veld-tabel">
+        <thead>
+          <tr><th>Kolom</th><th>Fictief voorbeeld</th><th>Waarom dit veld</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>id</code></td><td>1042</td><td>Regelnummer, zodat je een meting kunt aanwijzen of opschonen.</td></tr>
+          <tr><td><code>datum</code></td><td>2026-09-15</td><td>Zonder datum geen trend.</td></tr>
+          <tr><td><code>taaksoort</code></td><td>herschrijven</td><td>Komt uit <code>#taak</code>. Herschrijven en aanvullen zijn niet te vergelijken.</td></tr>
+          <tr><td><code>aantal_voor</code></td><td>7</td><td>De uitkomst van de regelcheck vóór de AI.</td></tr>
+          <tr><td><code>aantal_na</code></td><td>1</td><td>De uitkomst ná de AI. Samen zijn dit twee getallen die de kwaliteitsvraag beantwoorden.</td></tr>
+          <tr><td><code>regel_ids</code></td><td>zin-lengte, titel-lengte</td><td>Wélke regels blijven struikelen. Daarmee verbeter je de regelset of de prompt.</td></tr>
+          <tr><td><code>regelset_versie</code></td><td>v3 (2026-09-01)</td><td>Anders weet je niet of een verbetering aan de tekst of aan de nieuwe regels lag.</td></tr>
+        </tbody>
+      </table>
+      <p style="margin:14px 0 0; color:var(--sub);">
+        Dat is alles: <strong>getallen en regel-id's, geen paginatekst en geen namen.</strong> CRUD hierop:
+        <strong>C</strong> bij elke vergelijking, <strong>R</strong> voor het overzicht, <strong>D</strong> voor
+        opschonen na de bewaartermijn. <strong>U ontbreekt en dat hoort zo</strong> — een meting van gisteren
+        verandert niet. Er komt geen wijzigfunctie bij om het rijtje CRUD vol te maken.
+      </p>
+      <div class="let-op" style="margin-top:18px;">
+        <strong>Weeg dit eerlijk af.</strong> Deze ene tabel is meteen de eerste backend die de app krijgt: hosting,
+        een koppeling, waarschijnlijk inloggen, en daarmee een AVG-gesprek over wie er in kan kijken. Voor een MVP
+        met een handvol redacteuren is een maandelijkse handmatige turf (een lijstje in Teams of Excel) vaak genoeg
+        om dezelfde vraag te beantwoorden. Begin daarmee; bouw de tabel als je die turf echt te vaak mist.
+      </div>
+
+      <h3>Wat je niet hoeft te bewaren</h3>
+      <ul>
+        <li><b>Titel, introductie en hoofdtekst.</b> Staan al in het CMS of in het document van de redacteur. De app is een hulpmiddel in één werksessie, geen archief.</li>
+        <li><b>De taakkeuze.</b> Eén klik in een dropdown, opnieuw te maken. Alleen zinvol als kolom bij de meting.</li>
+        <li><b>De aandachtspunten.</b> Volledig herrekenbaar: zelfde tekst + zelfde regelset = zelfde uitkomst. Alleen het aantal is interessant.</li>
+        <li><b>De gegenereerde prompt.</b> Afgeleid van regelset, taak en invoer. Eén klik en hij is er weer.</li>
+        <li><b>De teruggeplakte AI-tekst.</b> De echte versie staat in Claude.ai en straks in het CMS.</li>
+        <li><b>De schrijfwijzer en de regelset.</b> De schrijfwijzer heeft al een eigenaar en een plek; de regelset staat al in het bestand. Twee kopieën is twee waarheden.</li>
+        <li><b>De inhoud van het klembord en van de Claude.ai-chat.</b> Buiten de app. Wel een reden om er geen bijzondere persoonsgegevens door te halen — niet een reden om het te kopiëren.</li>
+      </ul>
+
+      <h3>Keuzes die nog open staan</h3>
+      <ol class="keuzes">
+        <li><b>Gaan we meten, en op welk niveau?</b> Geaggregeerd per taaksoort en per maand, of per redacteur? Per redacteur maakt het een persoonsgegeven en verandert het gesprek met de redactie — dan is het geen kwaliteitsmeting meer maar een beoordeling.</li>
+        <li><b>Hoe lang bewaren we metingen?</b> Bijvoorbeeld twaalf maanden en daarna weg (dat is de <strong>D</strong> uit CRUD). Zonder afspraak groeit de tabel eeuwig.</li>
+        <li><b>Mag concepttekst op het toestel van de redacteur achterblijven?</b> Dat is de <code>localStorage</code>-vraag. Browseropslag is opslag: de tekst blijft staan tot iemand hem wist, ook op een gedeelde pc. Zo ja, dan hoort er een &laquo;wis concept&raquo;-knop bij.</li>
+        <li><b>Hoe verspreiden we de échte regelset en hoe zie je welke versie je hebt?</b> Mijn advies: een zichtbaar versienummer + datum in het bestand en één vaste downloadplek. Dat kost niets en lost het grootste deel op. Pas als je moet kunnen aantónen wie welke versie gebruikte, heb je opslag nodig.</li>
+        <li><b>Wil je de feedbackscore in de app?</b> Overtypen bij de meting (één veld, geen koppeling) of helemaal buiten de app laten. Een koppeling met analytics is een project op zich.</li>
+        <li><b>Voorbeeldteksten voor spoor Schrijfskills: vast of bijgehouden?</b> Twee of drie goedgekeurde voorbeelden hard in het bestand kost niets. Een bibliotheek die redacteuren zelf aanvullen vraagt C/U/D en dus wél een database.</li>
+      </ol>
+
+      <h3>Als je er één ding uithaalt</h3>
+      <p style="color:var(--sub); margin:6px 0 24px;">
+        De Redactiehulp is bewust een bestand zonder opslag, en dat is een kwaliteit, geen gebrek: geen login,
+        geen beheer, geen AVG-vragen, en een redacteur kan hem gewoon openen. Houd dat zo lang mogelijk zo.
+        De enige goede reden om dat op te geven is meten — en dan alleen met getallen, niet met teksten.
+      </p>
+    </div>
+  </section>
+
+  <footer class="eind">
+    <p><strong>Waarop dit is gebaseerd:</strong> <code>index.html</code> (regelcheck, promptgenerator, voor/na-vergelijking,
+      placeholder-RULES), <code>strategy.md</code> (doelprobleem, aanpak, sporen Regelkennis / Schrijfskills /
+      Kwaliteitscontrole, en &laquo;niet aan werken: vertalen&raquo;) en <code>README.md</code> (client-side, losse
+      HTML-versie met de echte regelset).</p>
+    <p><strong>Aannames zijn gemarkeerd met ⚠.</strong> De belangrijkste: dat de definitieve tekst via het bestaande
+      CMS van NederlandWereldwijd gepubliceerd wordt, en dat redacteuren Claude.ai gebruiken via een daarvoor
+      goedgekeurd account. Niet aangetroffen in de code of de strategie, wel logisch uit de use case.</p>
+    <p><strong>Alle voorbeeldwaarden op deze pagina zijn fictief</strong> (<code>schrijfwijzer-v3.docx</code>,
+      &laquo;vóór 7 → na 1&raquo;, <code>2026-09-15</code>). Er staan geen secrets, inloggegevens of echte
+      persoonsgegevens in deze pagina. Deze visualisatie wijzigt niets aan de werking van de app.</p>
+    <p>Deze pagina bewaart zelf niets: de filters en de CRUD-schakelaar zitten alleen in het geheugen en staan
+      na herladen weer op de beginstand.</p>
+  </footer>
+</div>
+
+<script>
+/* =====================================================================
+   Eén bron voor diagram, kaarten en matrix: dezelfde namen, dezelfde keuzes.
+   opslag: 'db' | 'tijdelijk' | 'extern' | 'keuze'
+   status: 'gebouwd' | 'strategie' | 'idee' | 'aanname'
+   crud[].k: 'db' | 'geen' | 'extern' | 'browser'
+   ===================================================================== */
+const CAT = {
+  db:        { label: "🗄 Databaseopslag", kort: "Databaseopslag" },
+  tijdelijk: { label: "⏱ Tijdelijk — mag weg", kort: "Tijdelijk" },
+  extern:    { label: "📄 Staat al elders", kort: "Al elders / extern" },
+  keuze:     { label: "❓ Keuze nodig", kort: "Keuze nodig" }
+};
+const STAT = {
+  gebouwd:   "✔ Gebouwd in index.html",
+  strategie: "◇ Staat in strategy.md",
+  idee:      "◌ Nog niet gebouwd — voorstel",
+  aanname:   "⚠ Aanname"
+};
+
+const DATA = [
+{
+  id:"invoertekst", nr:1, naam:"Invoertekst: titel, introductie, hoofdtekst",
+  opslag:"tijdelijk", status:["gebouwd"],
+  bron:"De redacteur typt of plakt in <code>#titel</code>, <code>#intro</code> en <code>#hoofdtekst</code>.",
+  verwerking:"<code>voerControleUit()</code> (regelcheck), <code>genereerPrompt()</code> en <code>vergelijk()</code> gebruiken dezelfde velden — allemaal in het geheugen van de browser.",
+  bestemming:"Aandachtspunten op het scherm (<code>#resultaten-invoer</code>), de prompt in <code>#prompt-output</code>, en — alleen na een klik — het klembord.",
+  nu:"Niets opgeslagen. De tekst staat uitsluitend in de formuliervelden; er is geen database, geen cookie en geen localStorage.",
+  advies:"Laat het tijdelijk. Niet opslaan.",
+  reden:"Deze tekst heeft al een eigenaar: het CMS of het Word-document van de redacteur. De Redactiehulp is een hulpmiddel binnen één werksessie, geen archief. Opslaan betekent een tweede versie van dezelfde pagina beheren.",
+  herladen:"Weg bij sluiten of F5 — dat is het huidige gedrag. Wil de redacteur dat niet, dan is dat de aparte keuze bij regel 14, niet een reden voor een database.",
+  crud:[{c:"—", t:"geen databaseactie — invoer, berekening en weergave", k:"geen"}],
+  m:{bron:"Redacteur typt/plakt in #titel, #intro, #hoofdtekst", verwerking:"regelcheck, promptgenerator, vergelijking (in het geheugen)", bestemming:"scherm, promptveld, klembord (na klik)", opslag:"niet bewaren", reden:"staat al in het CMS of het document van de redacteur", herladen:"niets — weg bij F5"},
+  nodes:["n-redacteur","n-invoer","n-regelcheck","n-prompt","n-vergelijk","n-scherm-check","n-klembord"],
+  edges:["e-red-invoer","e-bus-regelcheck","e-bus-prompt","e-bus-vergelijk","e-check-scherm","e-prompt-klembord"]
+},
+{
+  id:"taak", nr:2, naam:"Taakkeuze (#taak: nieuw / verbeteren / herschrijven)",
+  opslag:"tijdelijk", status:["gebouwd"],
+  bron:"De redacteur kiest in de dropdown <code>#taak</code>.",
+  verwerking:"<code>genereerPrompt()</code> zet de keuze om in één taakregel in de prompt.",
+  bestemming:"De gegenereerde prompt, verder niets.",
+  nu:"Niets opgeslagen. Staat na herladen weer op de eerste optie.",
+  advies:"Tijdelijk laten. Wél meenemen als kolom bij de kwaliteitsmeting (regel 10).",
+  reden:"Eén keuze per sessie die nul kost om opnieuw te maken. Bij de meting is het wel belangrijk: een volledige herschrijving en een kleine aanvulling zijn niet met elkaar te vergelijken.",
+  herladen:"Niets hoeft te blijven.",
+  crud:[{c:"—", t:"geen databaseactie — alleen invoer", k:"geen"}],
+  m:{bron:"dropdown #taak", verwerking:"genereerPrompt() maakt er een taakregel van", bestemming:"de prompt", opslag:"niet bewaren (wel als kolom bij de meting)", reden:"één klik, opnieuw te maken", herladen:"niets"},
+  nodes:["n-redacteur","n-invoer","n-prompt"],
+  edges:["e-red-invoer","e-bus-prompt"]
+},
+{
+  id:"regelset", nr:3, naam:"Regelset RULES (nu de placeholder-voorbeeldregels)",
+  opslag:"extern", status:["gebouwd","strategie"],
+  bron:"Het <code>RULES</code>-blok bovenaan het <code>&lt;script&gt;</code> in <code>index.html</code>, met per regel <code>id</code>, <code>titel</code>, <code>categorie</code>, <code>bron</code>, <code>scope</code> en <code>check()</code>.",
+  verwerking:"<code>voerControleUit()</code> loopt alle regels langs; <code>bouwRegelsSamenvatting()</code> zet de regeltitels in de prompt.",
+  bestemming:"Aandachtspunten op het scherm en de regels-sectie van de prompt.",
+  nu:"In het bestand <code>index.html</code>, en dus in Git. Het zijn nu vijf fictieve voorbeeldregels plus een kop-lengtecheck — expliciet géén officiële NWW-schrijfwijzer.",
+  advies:"Laat de regels in het bestand staan. Geen database. Zet er wel een zichtbaar versienummer en datum bij.",
+  reden:"Dit is spoor Regelkennis, en dat voelt als databasemateriaal — maar de regelset verandert een paar keer per jaar en hoort bij de release van het bestand. Zolang de app één statisch bestand is, levert een database niets op en maakt hij de app kwetsbaarder én beheerplichtig.",
+  herladen:"Blijft bestaan: het is onderdeel van het bestand.",
+  crud:[{c:"R", t:"lezen uit het bestand bij elke controle — geen eigen database", k:"extern"},{c:"—", t:"wijzigen = het bestand aanpassen (in Git), geen databaseactie", k:"geen", mw:"wijzigen gebeurt in Git"}],
+  m:{bron:"RULES-blok in index.html", verwerking:"voerControleUit() en bouwRegelsSamenvatting() lezen de regels", bestemming:"aandachtspunten + regels-sectie van de prompt", opslag:"blijft in het bestand", reden:"regelset hoort bij de release van het bestand; database geeft een tweede waarheid", herladen:"blijft — zit in het bestand"},
+  nodes:["n2-rules","n2-engine","n-regelcheck","n-prompt"],
+  edges:["e2-rules-engine"]
+},
+{
+  id:"schrijfwijzer", nr:4, naam:"Schrijfwijzer-brondocument (fictief: schrijfwijzer-v3.docx)",
+  opslag:"extern", status:["gebouwd","aanname"],
+  bron:"Het interne brondocument met de schrijfwijzer en huisstijlregels, op SharePoint/Teams of per e-mail. ⚠ Aanname over de exacte plek; de README zegt alleen dat het intern is en bewust niet in de publieke repo staat.",
+  verwerking:"Handmatig omgezet naar <code>check()</code>-functies in het RULES-blok, in een aparte sessie — buiten de app om.",
+  bestemming:"Het RULES-blok in <code>index.html</code>.",
+  nu:"Extern. Staat bewust niet in Git.",
+  advies:"Niet kopiëren naar een eigen database. Hoogstens verwijzen (naam + versie + datum).",
+  reden:"Het document heeft al een eigenaar en een vindplaats. Een kopie in een eigen database loopt achter op het origineel en dan weet niemand meer welke versie geldt.",
+  herladen:"Niet van toepassing: leeft buiten de app.",
+  crud:[{c:"—", t:"geen databaseactie — mensen lezen en verwerken het buiten de app", k:"geen"}],
+  m:{bron:"intern brondocument (SharePoint/Teams) ⚠", verwerking:"handmatig omgezet naar check()-functies, buiten de app", bestemming:"het RULES-blok in index.html", opslag:"niet kopiëren", reden:"origineel heeft al een eigenaar; een kopie loopt achter", herladen:"n.v.t. — leeft buiten de app"},
+  nodes:["n2-wijzer","n2-rules"],
+  edges:["e2-wijzer-rules"]
+},
+{
+  id:"aandachtspunten", nr:5, naam:"Aandachtspunten (issues uit de regelcheck)",
+  opslag:"tijdelijk", status:["gebouwd"],
+  bron:"Berekend uit de invoertekst en de regelset; per punt de regel, het tekstfragment, de uitleg en de bron.",
+  verwerking:"<code>renderIssues()</code> zet ze om in HTML.",
+  bestemming:"<code>#resultaten-invoer</code> op het scherm; de redacteur leest ze en past de tekst aan.",
+  nu:"Niets opgeslagen — alleen op het scherm.",
+  advies:"Tijdelijk laten. Alleen het <em>aantal</em> is de moeite waard om te bewaren (regel 10).",
+  reden:"Volledig herrekenbaar: dezelfde tekst plus dezelfde regelset geeft altijd dezelfde uitkomst. De losse punten opslaan levert geen nieuwe informatie op, en je zou er wel paginatekst in meenemen (de fragmenten).",
+  herladen:"Weg. Opnieuw op &laquo;Controleer tekst&raquo; klikken kost een halve seconde.",
+  crud:[{c:"—", t:"geen databaseactie — berekening en weergave", k:"geen"}],
+  m:{bron:"berekend uit invoertekst + regelset", verwerking:"renderIssues() maakt er HTML van", bestemming:"#resultaten-invoer op het scherm", opslag:"niet bewaren", reden:"herrekenbaar; fragmenten bevatten paginatekst", herladen:"niets"},
+  nodes:["n-invoer","n-regelcheck","n-scherm-check","n-redacteur"],
+  edges:["e-bus-regelcheck","e-check-scherm","e-scherm-redacteur"]
+},
+{
+  id:"prompt", nr:6, naam:"Gegenereerde prompt (#prompt-output)",
+  opslag:"tijdelijk", status:["gebouwd"],
+  bron:"Samengesteld uit de regelsamenvatting, de taakregel en de ingevoerde tekst.",
+  verwerking:"<code>genereerPrompt()</code> plakt het aan elkaar; <code>kopieerPrompt()</code> zet het op het klembord.",
+  bestemming:"Het tekstvak <code>#prompt-output</code> en daarna het klembord.",
+  nu:"Niets opgeslagen.",
+  advies:"Tijdelijk laten.",
+  reden:"Puur afgeleid: regelset + taak + invoer. Eén klik en hij is er weer. Opslaan zou betekenen dat je de hele paginatekst nóg een keer bewaart, want die zit in de prompt.",
+  herladen:"Weg — en dat is prima.",
+  crud:[{c:"—", t:"geen databaseactie — samenstellen en transport", k:"geen"}],
+  m:{bron:"regelsamenvatting + taak + invoertekst", verwerking:"genereerPrompt(), daarna kopieerPrompt()", bestemming:"#prompt-output en het klembord", opslag:"niet bewaren", reden:"afgeleid en met één klik opnieuw te maken", herladen:"niets"},
+  nodes:["n-invoer","n-prompt","n-klembord"],
+  edges:["e-bus-prompt","e-prompt-klembord"]
+},
+{
+  id:"klembord", nr:7, naam:"Klembordinhoud (prompt heen, AI-tekst terug)",
+  opslag:"extern", status:["gebouwd"],
+  bron:"<code>kopieerPrompt()</code> via <code>navigator.clipboard</code> (met <code>execCommand</code> als terugvaloptie), en Ctrl+C in Claude.ai.",
+  verwerking:"Geen. Dit is alleen transport.",
+  bestemming:"Claude.ai heen; het veld <code>#ai-output</code> terug.",
+  nu:"Bij het besturingssysteem, buiten de app. Blijft daar tot de redacteur iets anders kopieert.",
+  advies:"Niets mee doen en niet opslaan.",
+  reden:"Transport, geen gegeven dat de app bezit. Let wel op: het klembord is zelf ook opslag op het toestel. Dat is een reden om er geen bijzondere persoonsgegevens door te halen — niet een reden om het te kopiëren.",
+  herladen:"Blijft op het toestel staan, buiten de app om.",
+  crud:[{c:"—", t:"geen databaseactie — alleen transport", k:"geen"}],
+  m:{bron:"kopieerPrompt() en Ctrl+C in Claude.ai", verwerking:"geen — alleen transport", bestemming:"Claude.ai heen, #ai-output terug", opslag:"niet bewaren (staat buiten de app)", reden:"transport; de app bezit dit gegeven niet", herladen:"blijft op het toestel, buiten de app"},
+  nodes:["n-prompt","n-klembord","n-claude","n-aioutput"],
+  edges:["e-prompt-klembord","e-klembord-claude","e-claude-klembord","e-klembord-aioutput"]
+},
+{
+  id:"claude", nr:8, naam:"Prompt en tekst in Claude.ai",
+  opslag:"extern", status:["gebouwd","aanname"],
+  bron:"De redacteur plakt de gegenereerde prompt in Claude.ai. Dit is een bewuste handmatige stap; de app doet zelf geen enkel netwerkverzoek.",
+  verwerking:"Claude.ai schrijft of herschrijft de tekst — dit is spoor Schrijfskills, dat nu volledig buiten de app gebeurt.",
+  bestemming:"De chat bij Claude.ai, en via het klembord terug naar de app.",
+  nu:"In de chatgeschiedenis van de redacteur bij Anthropic. ⚠ Aanname: redacteuren doen dit met een daarvoor goedgekeurd account.",
+  advies:"Niet naar een eigen database kopiëren.",
+  reden:"Een kopie van elke chat in een eigen database maakt de output niet beter, maar wel de app zwaarder en het risico groter. Wil je iets vasthouden, houd dan de twee getallen van de vergelijking vast (regel 10), niet de teksten.",
+  herladen:"Blijft bij Claude.ai staan, ook als de app dichtgaat.",
+  crud:[{c:"—", t:"geen databaseactie in de Redactiehulp", k:"geen", mw:"geen databaseactie in de app"}],
+  m:{bron:"redacteur plakt de prompt in Claude.ai", verwerking:"Claude.ai (her)schrijft — buiten de app", bestemming:"chat bij Claude.ai + klembord terug", opslag:"niet kopiëren", reden:"kopie verbetert de output niet en vergroot het risico", herladen:"blijft bij Claude.ai"},
+  nodes:["n-klembord","n-claude","n-cms"],
+  edges:["e-klembord-claude","e-claude-klembord","e-claude-cms"]
+},
+{
+  id:"aioutput", nr:9, naam:"Herschreven tekst (#ai-output)",
+  opslag:"tijdelijk", status:["gebouwd"],
+  bron:"De redacteur plakt de output van Claude.ai terug in <code>#ai-output</code>.",
+  verwerking:"<code>vergelijk()</code> laat de regelcheck er nog een keer over lopen en zet de uitkomst naast die van het origineel.",
+  bestemming:"<code>#resultaten-vergelijking</code> op het scherm; daarna handmatig naar het CMS.",
+  nu:"Niets opgeslagen.",
+  advies:"Tijdelijk laten.",
+  reden:"De echte versie staat al in Claude.ai en gaat straks naar het CMS. De app hoeft alleen te vergelijken, niet te bewaren.",
+  herladen:"Weg. De redacteur heeft de tekst dan al in het CMS of nog in Claude.ai staan.",
+  crud:[{c:"—", t:"geen databaseactie — invoer, berekening en weergave", k:"geen"}],
+  m:{bron:"redacteur plakt AI-output in #ai-output", verwerking:"vergelijk() draait de regelcheck opnieuw", bestemming:"#resultaten-vergelijking; daarna het CMS", opslag:"niet bewaren", reden:"echte versie staat in Claude.ai en het CMS", herladen:"niets"},
+  nodes:["n-claude","n-klembord","n-aioutput","n-vergelijk","n-scherm-verg"],
+  edges:["e-claude-klembord","e-klembord-aioutput","e-aioutput-vergelijk","e-vergelijk-scherm"]
+},
+{
+  id:"meting", nr:10, naam:"Kwaliteitsmeting: aantal aandachtspunten vóór en na",
+  opslag:"db", status:["strategie","idee"],
+  bron:"<code>vergelijk()</code> heeft de twee getallen al in handen: <code>voorIssues.length</code> en <code>naIssues.length</code>.",
+  verwerking:"Er zou één regel van gemaakt worden: datum, taaksoort, aantal vóór, aantal na, de betrokken regel-id's en de regelsetversie. Geen paginatekst.",
+  bestemming:"De eigen database, tabel <code>kwaliteitsmeting</code>, en daarna een eenvoudig overzicht of trendlijstje.",
+  nu:"Niets. De getallen staan één keer op het scherm en zijn daarna definitief weg.",
+  advies:"Dít is het enige gegeven dat duurzaam in een eigen database hoort — en alleen als je het meten echt gaat doen.",
+  reden:"Spoor Kwaliteitscontrole wil controleren én meten. Meten is vergelijken over tijd: zie je na een nieuwe regelset of een betere prompt minder aandachtspunten? Zonder opslag is elke meting na één keer F5 verdwenen en blijft &laquo;de kwaliteit is verbeterd&raquo; een gevoel in plaats van een cijfer.",
+  herladen:"Moet blijven bestaan — dat is precies het punt. Al het andere op deze pagina mag verdwijnen; dit niet.",
+  crud:[
+    {c:"C", t:"meting opslaan bij elke vergelijking — eigen database", k:"db"},
+    {c:"R", t:"overzicht en trend lezen — eigen database", k:"db"},
+    {c:"D", t:"opschonen na de bewaartermijn — eigen database", k:"db"},
+    {c:"—", t:"U (wijzigen) is niet nodig: een meting van gisteren verandert niet", k:"geen", mw:"U niet nodig"}
+  ],
+  vraag:"Meten we geaggregeerd (per taaksoort, per maand) of per redacteur? Per redacteur is een persoonsgegeven en maakt er een beoordeling van in plaats van een kwaliteitsmeting. En hoe lang bewaren we: twaalf maanden?",
+  m:{bron:"vergelijk(): voorIssues.length en naIssues.length", verwerking:"één regel samenstellen (getallen + regel-id's, geen tekst)", bestemming:"eigen database, tabel kwaliteitsmeting", opslag:"wél duurzaam bewaren", reden:"meten kan niet zonder historie (spoor Kwaliteitscontrole)", herladen:"moet blijven bestaan"},
+  nodes:["n-vergelijk","n-db"],
+  edges:["e-vergelijk-db"]
+},
+{
+  id:"cms", nr:11, naam:"Definitieve tekst op de NWW-website (CMS)",
+  opslag:"extern", status:["aanname"],
+  bron:"De redacteur neemt de goedgekeurde tekst over uit Claude.ai of uit de app.",
+  verwerking:"Geen, in de Redactiehulp. Het plaatsen gebeurt in het CMS.",
+  bestemming:"Het bestaande CMS van NederlandWereldwijd.",
+  nu:"Buiten de app. ⚠ Aanname: de redacteur publiceert via het bestaande CMS en de Redactiehulp raakt dat niet aan. Dit staat niet in de code of in strategy.md, maar volgt uit de use case (&laquo;content op bestaande pagina's toevoegen of wijzigen&raquo;).",
+  advies:"Zo laten: geen koppeling en geen kopie in een eigen database.",
+  reden:"Het CMS is al de bron van waarheid voor gepubliceerde tekst. Een tweede kopie geeft twee waarheden en de vraag welke klopt.",
+  herladen:"Blijft in het CMS staan, los van de app.",
+  crud:[{c:"C/U", t:"aanmaken of wijzigen in het CMS (extern) — de redacteur doet dat daar", k:"extern"},{c:"—", t:"geen databaseactie in de Redactiehulp", k:"geen", mw:"geen databaseactie in de app"}],
+  vraag:"Blijft plaatsen in het CMS volledig handwerk, of wil je later een export of koppeling? Dat laatste verandert de app van hulpmiddel in schakel in de publicatieketen.",
+  m:{bron:"redacteur neemt de goedgekeurde tekst over", verwerking:"geen — gebeurt in het CMS", bestemming:"CMS van NederlandWereldwijd ⚠", opslag:"staat al elders", reden:"CMS is al de bron van waarheid", herladen:"blijft in het CMS"},
+  nodes:["n-claude","n-cms","n-redacteur"],
+  edges:["e-claude-cms"]
+},
+{
+  id:"feedbackscore", nr:12, naam:"Feedbackscore van een pagina",
+  opslag:"keuze", status:["strategie"],
+  bron:"strategy.md noemt een slechte feedbackscore als aanleiding om een pagina volledig te herschrijven. Die score staat nu ergens anders (website/analytics), niet in de app.",
+  verwerking:"Geen — de app weet er niets van.",
+  bestemming:"Niet van toepassing.",
+  nu:"Extern en buiten de app. Komt in het diagram (nog) niet voor.",
+  advies:"Niet automatisch binnenhalen. Als je hem wilt zien: laat de redacteur het getal overtypen bij de meting — één veld, geen koppeling.",
+  reden:"Een koppeling met analytics is een project op zich, met beheer en autorisatie, terwijl het startsignaal (&laquo;deze pagina moet op de schop&raquo;) ook zonder de app prima werkt.",
+  herladen:"Niet van toepassing zolang de app er niets mee doet.",
+  crud:[{c:"—", t:"geen databaseactie — nu nergens in de app", k:"geen"}],
+  vraag:"Wil je de feedbackscore als startsignaal in de app (overtypen bij de meting), of blijft dat helemaal buiten de app?",
+  m:{bron:"website/analytics (extern)", verwerking:"geen — app weet er niets van", bestemming:"n.v.t.", opslag:"keuze nodig", reden:"koppeling is een project op zich; overtypen kan volstaan", herladen:"n.v.t."},
+  nodes:["n-redacteur"],
+  edges:[]
+},
+{
+  id:"regelsetversie", nr:13, naam:"Welke regelsetversie iemand gebruikt",
+  opslag:"keuze", status:["gebouwd","idee"],
+  bron:"De README beschrijft het: de échte regelset gaat als los HTML-bestand rond via Teams, e-mail of SharePoint, buiten Git.",
+  verwerking:"Geen.",
+  bestemming:"Het toestel van de redacteur.",
+  nu:"Nergens vastgelegd. Niemand kan zien of iemand met een verouderde regelset werkt.",
+  advies:"Geen database. Zet een zichtbaar versienummer en datum in de footer van het bestand, en verspreid via één vaste plek.",
+  reden:"Het probleem is distributie, niet opslag. Een versienummer in het bestand kost niets en lost het grootste deel op. Pas als je moet kunnen aantónen wie welke versie gebruikte, heb je opslag nodig — en dan sla je gebruikersgedrag op, wat een heel ander gesprek is.",
+  herladen:"Het bestand op het toestel blijft zoals het is, met of zonder versienummer.",
+  crud:[{c:"—", t:"geen databaseactie — een versienummer in het bestand is genoeg", k:"geen"}],
+  vraag:"Volstaat een versienummer + datum in het bestand met één vaste downloadplek, of moet je echt kunnen zien wie welke versie gebruikt (dan pas opslag)?",
+  m:{bron:"losse HTML-versie via Teams/e-mail/SharePoint", verwerking:"geen", bestemming:"het toestel van de redacteur", opslag:"keuze nodig — advies: versienummer in het bestand", reden:"distributieprobleem, geen opslagprobleem", herladen:"bestand blijft zoals het is"},
+  nodes:["n2-rules","n2-losse"],
+  edges:["e2-rules-losse"]
+},
+{
+  id:"concept", nr:14, naam:"Concepttekst bewaren tussen sessies (browseropslag)",
+  opslag:"keuze", status:["idee"],
+  bron:"De invoervelden van de redacteur.",
+  verwerking:"Zou bij elke wijziging in <code>localStorage</code> worden gezet en bij het openen weer worden teruggezet.",
+  bestemming:"<code>localStorage</code> in de browser van de redacteur — op het toestel, niet in een eigen database.",
+  nu:"NIET gebouwd. <code>index.html</code> gebruikt geen <code>localStorage</code> en geen <code>sessionStorage</code>; bij F5 is de tekst weg.",
+  advies:"Alleen doen als redacteuren er echt om vragen, en dan met een duidelijke &laquo;wis concept&raquo;-knop.",
+  reden:"Let op: <strong>localStorage is opslag, geen tijdelijk werkgeheugen.</strong> De tekst blijft op het toestel staan tot iemand hem wist — ook op een gedeelde of uitgeleende pc, en ook als de redacteur denkt dat hij klaar is. Dat is een bewuste keuze over waar paginatekst mag achterblijven, geen technisch detail.",
+  herladen:"Zou juist blijven bestaan na herladen. Dat is de hele bedoeling én precies het risico.",
+  crud:[
+    {c:"C/U", t:"concept opslaan en bijwerken — browseropslag, niet je eigen database", k:"browser"},
+    {c:"R", t:"concept terugzetten bij het openen — browseropslag", k:"browser"},
+    {c:"D", t:"&laquo;wis concept&raquo;-knop — browseropslag", k:"browser"}
+  ],
+  vraag:"Mag concepttekst op het toestel van de redacteur achterblijven? Zo ja: automatisch wissen bij sluiten, of pas na een klik op &laquo;wis concept&raquo;?",
+  m:{bron:"de invoervelden", verwerking:"zou naar localStorage worden geschreven en teruggelezen", bestemming:"localStorage in de browser van de redacteur", opslag:"keuze nodig — browseropslag is opslag", reden:"tekst blijft op het toestel staan tot iemand wist", herladen:"zou blijven bestaan — bedoeling en risico"},
+  nodes:["n-invoer","n-localstorage"],
+  edges:["e-bus-localstorage"]
+},
+{
+  id:"voorbeeldteksten", nr:15, naam:"Goedgekeurde voorbeeldteksten voor de prompt",
+  opslag:"keuze", status:["strategie","idee"],
+  bron:"Spoor Schrijfskills: de AI moet niet alleen de regels kennen maar ook goed schrijven. Goedgekeurde NWW-pagina's zijn daarvoor het beste materiaal.",
+  verwerking:"Zouden als voorbeeld in de gegenereerde prompt komen. Nu stuurt <code>bouwRegelsSamenvatting()</code> alleen de regeltitels mee.",
+  bestemming:"De gegenereerde prompt.",
+  nu:"Bestaat niet. De prompt bevat nu uitsluitend regeltitels, taak en de ingevoerde tekst.",
+  advies:"Begin met twee of drie voorbeelden hard in het bestand, net als het RULES-blok. Nog geen database.",
+  reden:"Vaste voorbeelden in het bestand geven het grootste deel van het effect voor bijna niets. Een bibliotheek die redacteuren zelf bijhouden vraagt aanmaken, wijzigen en verwijderen — en dus wél een database plus beheer. Dat is een aparte beslissing, geen bijproduct.",
+  herladen:"Vaste voorbeelden blijven in het bestand staan; een bijgehouden bibliotheek zou opslag nodig hebben.",
+  crud:[{c:"R", t:"lezen uit het bestand — geen databaseactie", k:"extern"},{c:"—", t:"pas bij een bijgehouden bibliotheek: C/U/D in een eigen database — keuze nodig", k:"geen", mw:"C/U/D pas bij een bibliotheek"}],
+  vraag:"Vaste voorbeelden in het bestand, of een bibliotheek die redacteuren zelf kunnen aanvullen? Alleen het tweede vraagt een database.",
+  m:{bron:"goedgekeurde NWW-pagina's (spoor Schrijfskills)", verwerking:"zouden als voorbeeld in de prompt komen", bestemming:"de gegenereerde prompt", opslag:"keuze nodig — advies: in het bestand", reden:"vaste voorbeelden kosten niets; een bibliotheek vraagt C/U/D", herladen:"blijft in het bestand"},
+  nodes:["n-prompt"],
+  edges:[]
+}
+];
+
+/* ===================== filters, kaarten, matrix, diagram ===================== */
+const FILTERS = {
+  alle:  () => true,
+  db:    d => d.opslag === "db",
+  geen:  d => d.opslag === "tijdelijk" || d.opslag === "extern",
+  keuze: d => d.opslag === "keuze"
+};
+
+let huidigFilter = "alle";
+let selectie = null;          /* id van het gegeven waarvan de route oplicht */
+let crudAan = true;
+
+const byId = id => DATA.find(d => d.id === id);
+const zichtbaar = () => DATA.filter(FILTERS[huidigFilter]);
+
+function pil(cat){ return '<span class="pil pil-' + cat + '">' + CAT[cat].label + '</span>'; }
+function statusPillen(st){ return st.map(s => '<span class="pil pil-st ' + s + '">' + STAT[s] + '</span>').join(""); }
+function crudChips(d){
+  return d.crud.map(c => '<span class="crudchip k-' + c.k + '"><b>' + c.c + '</b> ' + c.t + '</span>').join("");
+}
+
+function kaartHtml(d){
+  const vraagRij = d.vraag
+    ? '<dt class="vraag">Keuze nodig</dt><dd class="vraag">' + d.vraag + '</dd>'
+    : "";
+  return '' +
+  '<article class="kaart" data-id="' + d.id + '" data-opslag="' + d.opslag + '">' +
+    '<div class="kaart-kop">' +
+      '<h3><span class="nummer">' + d.nr + '.</span>' + d.naam + '</h3>' +
+      '<div class="kaart-pillen">' + statusPillen(d.status) + pil(d.opslag) + '</div>' +
+    '</div>' +
+    '<div class="route">' +
+      '<div class="stap"><b>Bron</b>' + d.bron + '</div>' +
+      '<div class="pijl" aria-hidden="true">&rarr;</div>' +
+      '<div class="stap"><b>Verwerking</b>' + d.verwerking + '</div>' +
+      '<div class="pijl" aria-hidden="true">&rarr;</div>' +
+      '<div class="stap"><b>Bestemming</b>' + d.bestemming + '</div>' +
+    '</div>' +
+    '<div class="crudrij">' + crudChips(d) + '</div>' +
+    '<dl class="detail">' +
+      '<dt>Nu in de app</dt><dd>' + d.nu + '</dd>' +
+      '<dt>Advies</dt><dd><strong>' + d.advies + '</strong></dd>' +
+      '<dt>Waarom</dt><dd>' + d.reden + '</dd>' +
+      '<dt>Na sluiten of herladen</dt><dd>' + d.herladen + '</dd>' +
+      vraagRij +
+    '</dl>' +
+    '<div class="kaart-acties">' +
+      '<button type="button" class="knop route-knop" data-id="' + d.id + '" aria-pressed="false">Toon route in het diagram</button>' +
+    '</div>' +
+  '</article>';
+}
+
+/* in de matrix alleen de letter + waar de actie plaatsvindt; de toelichting staat op de kaart */
+function kort(c){
+  if (c.mw) return c.mw;
+  if (c.k === "geen")    return "geen databaseactie";
+  if (c.k === "db")      return "eigen database";
+  if (c.k === "browser") return "browseropslag (op het toestel)";
+  return c.c === "R" ? "uit het bestand" : "in het CMS (extern)";
+}
+
+function rijHtml(d){
+  const crud = d.crud.map(c => '<span class="cl k-' + c.k + '"><b>' + c.c + '</b> ' + kort(c) + '</span>').join("");
+  return '' +
+  '<tr data-id="' + d.id + '">' +
+    '<td class="gegeven">' + d.nr + '. ' + d.naam + '<br>' + statusPillen(d.status) + '</td>' +
+    '<td>' + d.m.bron + '</td>' +
+    '<td>' + d.m.verwerking + '</td>' +
+    '<td>' + d.m.bestemming + '</td>' +
+    '<td class="crud">' + crud + '</td>' +
+    '<td>' + pil(d.opslag) + '<br>' + d.m.opslag + '</td>' +
+    '<td>' + d.m.reden + '</td>' +
+    '<td>' + d.m.herladen + '</td>' +
+  '</tr>';
+}
+
+function tekenLijsten(){
+  const lijst = zichtbaar();
+  document.getElementById("kaarten").innerHTML = lijst.map(kaartHtml).join("");
+  document.getElementById("matrix-body").innerHTML = lijst.map(rijHtml).join("");
+  document.getElementById("kaarten-leeg").style.display = lijst.length ? "none" : "block";
+
+  document.querySelectorAll(".route-knop").forEach(b => {
+    b.addEventListener("click", () => kiesRoute(b.dataset.id));
+  });
+  document.querySelectorAll("#matrix-body tr").forEach(tr => {
+    tr.addEventListener("click", () => kiesRoute(tr.dataset.id));
+  });
+  markeerSelectie();
+}
+
+function markeerSelectie(){
+  document.querySelectorAll(".kaart").forEach(k => k.classList.toggle("gekozen", k.dataset.id === selectie));
+  document.querySelectorAll("#matrix-body tr").forEach(r => r.classList.toggle("gekozen", r.dataset.id === selectie));
+  document.querySelectorAll(".route-knop").forEach(b => {
+    const aan = b.dataset.id === selectie;
+    b.setAttribute("aria-pressed", aan ? "true" : "false");
+    b.textContent = aan ? "Route verbergen" : "Toon route in het diagram";
+  });
+}
+
+function tekenDiagram(){
+  const actief = selectie ? [byId(selectie)] : zichtbaar();
+  const knopen = new Set(), pijlen = new Set();
+  actief.forEach(d => { d.nodes.forEach(n => knopen.add(n)); d.edges.forEach(e => pijlen.add(e)); });
+
+  document.querySelectorAll(".node").forEach(n => n.classList.toggle("aan", knopen.has(n.id)));
+  document.querySelectorAll(".edge").forEach(e => e.classList.toggle("aan", pijlen.has(e.id)));
+
+  const dimmen = !!selectie || huidigFilter !== "alle";
+  document.querySelectorAll(".diagram").forEach(g => g.classList.toggle("dimmen", dimmen));
+
+  /* melding */
+  const melding = document.getElementById("selectie-melding");
+  const tekst = document.getElementById("selectie-tekst");
+  if (selectie){
+    const d = byId(selectie);
+    tekst.innerHTML = d.edges.length
+      ? "Volledige route van <strong>" + d.naam + "</strong> licht op in het diagram. De rest is gedimd, niet weg."
+      : "<strong>" + d.naam + "</strong> komt nog niet in het diagram voor — dit gegeven staat alleen in de strategie of in het voorstel.";
+    melding.classList.add("aan");
+  } else if (huidigFilter !== "alle"){
+    const n = zichtbaar().length;
+    tekst.innerHTML = "Filter <strong>" + document.querySelector('.chip[data-filter="' + huidigFilter + '"]').dataset.naam +
+      "</strong>: " + n + " gegeven(s). In het diagram lichten alle bijbehorende routes volledig op; de rest is gedimd.";
+    melding.classList.add("aan");
+  } else {
+    melding.classList.remove("aan");
+  }
+}
+
+function kiesRoute(id){
+  selectie = (selectie === id) ? null : id;
+  markeerSelectie();
+  tekenDiagram();
+  if (selectie){
+    const doel = byId(id).edges.length ? document.getElementById("diagram") : null;
+    if (doel) doel.scrollIntoView({behavior:"smooth", block:"start"});
+  }
+}
+
+/* ---------- werkbalk ---------- */
+document.querySelectorAll(".chip[data-filter]").forEach(chip => {
+  chip.addEventListener("click", () => {
+    huidigFilter = chip.dataset.filter;
+    selectie = null;
+    document.querySelectorAll(".chip[data-filter]").forEach(c =>
+      c.setAttribute("aria-pressed", c === chip ? "true" : "false"));
+    tekenLijsten();
+    tekenDiagram();
+  });
+});
+
+document.getElementById("selectie-wis").addEventListener("click", () => {
+  huidigFilter = "alle"; selectie = null;
+  document.querySelectorAll(".chip[data-filter]").forEach(c =>
+    c.setAttribute("aria-pressed", c.dataset.filter === "alle" ? "true" : "false"));
+  tekenLijsten();
+  tekenDiagram();
+});
+
+const crudKnop = document.getElementById("crud-schakel");
+crudKnop.addEventListener("click", () => {
+  crudAan = !crudAan;
+  document.body.classList.toggle("crud-uit", !crudAan);
+  crudKnop.setAttribute("aria-pressed", crudAan ? "true" : "false");
+  document.getElementById("crud-tekst").textContent = crudAan ? "CRUD-labels: aan" : "CRUD-labels: uit";
+});
+
+/* ---------- tellingen + eerste tekening ---------- */
+Object.keys(FILTERS).forEach(f => {
+  const el = document.querySelector('[data-telling="' + f + '"]');
+  if (el) el.textContent = DATA.filter(FILTERS[f]).length;
+});
+tekenLijsten();
+tekenDiagram();
+</script>
+</body>
+</html>
