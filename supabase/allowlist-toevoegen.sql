@@ -1,32 +1,33 @@
 -- =============================================================================
--- Eén account toegang geven (of weer intrekken)
+-- Iemand toegang geven, of toegang intrekken
 -- =============================================================================
--- Draai dit in de SQL Editor NADAT je de gebruiker in het dashboard hebt
--- aangemaakt (Authentication → Users → Add user → Auto Confirm User aan).
+-- De allowlist staat op e-mailadres en mag vooruit worden ingevuld: het account
+-- hoeft nog niet te bestaan. Sterker nog, zonder rij hier kan het account niet
+-- eens worden aangemaakt — de trigger beperk_registratie_tot_allowlist weigert
+-- dat, ook vanuit het dashboard.
 --
--- Pas alleen het e-mailadres aan. Zet hier geen wachtwoorden in.
+-- Zet hier nooit wachtwoorden in.
 -- =============================================================================
 
--- --- Toegang geven -----------------------------------------------------------
-insert into public.toegestane_gebruiker (user_id, email, rol)
-select u.id, u.email, 'redacteur'
-from auth.users u
-where u.email = 'toegestaan.redacteur@example.com'
-on conflict (user_id) do update set actief = true;
+-- --- Iemand toegang geven ----------------------------------------------------
+insert into public.toegestane_gebruiker (email, rol, actief)
+values ('nieuwe.redacteur@example.com', 'redacteur', true)
+on conflict (email) do update set actief = true, rol = excluded.rol;
 
--- --- Toegang intrekken zonder het account te verwijderen ----------------------
--- update public.toegestane_gebruiker
---    set actief = false
---  where email = 'toegestaan.redacteur@example.com';
+-- --- Een account laten bestaan maar GEEN gegevens geven (testgeval) ----------
+-- insert into public.toegestane_gebruiker (email, rol, actief)
+-- values ('geen.toegang@example.com', 'tester', false)
+-- on conflict (email) do update set actief = false;
 
--- --- Controle: wie staat er op de lijst? -------------------------------------
-select t.email, t.rol, t.actief, t.aangemaakt_op
+-- --- Toegang intrekken zonder het account te verwijderen ---------------------
+-- update public.toegestane_gebruiker set actief = false
+--  where email = 'nieuwe.redacteur@example.com';
+
+-- --- Controle ----------------------------------------------------------------
+select t.email,
+       t.rol,
+       t.actief                                          as mag_bij_de_gegevens,
+       case when t.user_id is null then 'account bestaat nog niet'
+            else 'gekoppeld aan account' end             as status
 from public.toegestane_gebruiker t
-order by t.aangemaakt_op;
-
--- --- Controle: welke accounts bestaan er, en staan ze op de lijst? -----------
-select u.email                                    as account,
-       (t.user_id is not null and t.actief)       as heeft_toegang
-from auth.users u
-left join public.toegestane_gebruiker t on t.user_id = u.id
-order by u.created_at;
+order by t.email;

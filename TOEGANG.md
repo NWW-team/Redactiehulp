@@ -21,31 +21,46 @@ staat er geen enkel geheim in.
 
 ## Stand van zaken (bijgewerkt 15 sep 2026)
 
-Het databasewerk is **al uitgevoerd** in project `SSBNWW's Project`
-(`wmqketplyfscvcxxpnmb`, eu-west-1) via de Supabase-koppeling. Je hoeft stap A3,
-A4-voorbereiding en de project-URL niet meer zelf te doen.
+Alles wat vanuit de database kan, is **al gedaan en getest** in project
+`SSBNWW's Project` (`wmqketplyfscvcxxpnmb`). Deel A hieronder is grotendeels
+overbodig geworden; het staat er nog als naslag.
 
-| Stap | Status |
+**Wat er live staat**
+
+- Tabellen `toegestane_gebruiker` (allowlist op e-mailadres) en `schrijfwijzer_regel`,
+  allebei met RLS aan, één select-policy, en geen schrijfrechten voor `anon` of
+  `authenticated`.
+- Zes fictieve regels in `schrijfwijzer_regel`.
+- Twee adressen staan vooruit op de allowlist:
+  `toegestaan.redacteur@example.com` (actief) en `geen.toegang@example.com` (niet actief).
+- Trigger `beperk_registratie_tot_allowlist`: een account met een adres dat niet op de
+  allowlist staat, kan **niet worden aangemaakt** — ook niet vanuit het dashboard.
+  De beperking zit dus in de database, niet in een schakelaar of een verborgen knop.
+- Trigger `koppel_allowlist_aan_account`: koppelt de allowlist-rij automatisch zodra
+  het account bestaat. Er hoeft achteraf niets meer gekoppeld te worden.
+
+**Wat er is getest** (proefinserts in een transactie die is teruggedraaid)
+
+| Scenario | Uitkomst |
 |---|---|
-| A1. Registratie uitzetten | **jij** — kan alleen in het dashboard |
-| A2. Twee testaccounts aanmaken | **jij** — kan alleen in het dashboard |
-| A3. Tabellen, policies, functie, revokes | klaar en geverifieerd |
-| A4. Account op de allowlist zetten | wacht op A2 |
-| A5. Project-URL in `supabase-config.js` | klaar |
-| A5. Anon/publishable key | **jij** — ophalen werd geblokkeerd, zie hieronder |
-| Deel B. Cloudflare | **jij** — geen koppeling beschikbaar |
+| Registratie met adres buiten de lijst | geweigerd door de trigger |
+| Registratie met adres op de lijst (andere hoofdletters) | toegelaten en automatisch gekoppeld |
+| Uitgelogd (`anon`) regels opvragen | 0 rijen |
+| Ingelogd en actief op de lijst | 6 regels, 1 eigen allowlist-rij |
+| Ingelogd maar niet actief | 0 regels |
+| Ingelogde gebruiker probeert een regel toe te voegen | geweigerd (`permission denied`) |
 
-Geverifieerd na het aanmaken:
+Daarna gecontroleerd: `auth.users` is weer leeg, de allowlist-rijen zijn niet gekoppeld —
+de proef heeft niets achtergelaten.
 
-```
-tabel                  rls_aan  policies  schrijfrechten anon/authenticated
-schrijfwijzer_regel    true     1         geen
-toegestane_gebruiker   true     1         geen
-```
+**Wat er nog moet gebeuren**
 
-Zes fictieve regels staan in `schrijfwijzer_regel`. De allowlist is nog leeg — dus op
-dit moment krijgt *niemand* de regelset te zien, ook een ingelogd account niet. Dat is
-de juiste beginstand.
+| Stap | Door wie |
+|---|---|
+| Twee testaccounts aanmaken in het dashboard | **jij** — alleen GoTrue kan wachtwoorden zetten |
+| Anon/publishable key in `supabase-config.js` | **jij** — sleuteltool is geblokkeerd in deze sessie |
+| "Allow new users to sign up" uitzetten | **jij**, optioneel — de trigger dekt dit al af |
+| Deel B: Cloudflare Pages + Access | **jij** — geen koppeling beschikbaar |
 
 
 ---
