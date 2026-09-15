@@ -129,6 +129,49 @@ uit en de e-mailinstellingen van het project blijven ongewijzigd.
 
 ---
 
+---
+
+## Testverslag (15 sep 2026)
+
+### Geverifieerd in de database, onder de echte user-id's
+
+| Scenario | Regels zichtbaar | Eigen allowlist-rij |
+|---|---|---|
+| Uitgelogd (`anon`) | 0 | 0 |
+| `toegestaan.redacteur@example.com` | 6 | 1 |
+| `geen.toegang@example.com` | 0 | 1 (`actief = false`) |
+| Toegestaan account leest de rij van het andere account | 0 | — |
+| Niet-toegestaan account maakt zichzelf actief | geweigerd (`permission denied`) | — |
+| Registratie met adres buiten de allowlist | geweigerd door de trigger | — |
+| Registratie met adres op de allowlist | toegelaten, automatisch gekoppeld | — |
+| Ingelogde gebruiker voegt een regel toe | geweigerd (`permission denied`) | — |
+
+### Geverifieerd aan de serverkant
+
+- Beide accounts hebben daadwerkelijk ingelogd (`last_sign_in_at` gevuld voor allebei).
+- Na afloop: **0 open sessies en 0 uitgegeven refresh tokens** voor beide accounts.
+  Uitloggen heeft de sessies dus echt ingetrokken, niet alleen het scherm omgezet.
+- GitHub Pages staat aan; `app.html` is bereikbaar.
+
+### Geverifieerd in de browser (door de gebruiker)
+
+De acht tests uit deel C: uitgelogd geen regelset, direct gegevensverzoek geeft `[]`,
+toegestaan account laadt zes regels, niet-toegestaan account krijgt "Geen toegang",
+uitloggen wist de invoer, en de directe URL naar `app.html` toont zonder sessie het
+inlogscherm.
+
+### Wat NIET is getest
+
+- **De Cloudflare-laag bestaat niet.** `app.html` is publiek bereikbaar voor iedereen
+  met de URL. Alleen de gegevens zijn afgeschermd. Zie deel D.
+- **De echte schrijfwijzer is niet geladen.** Er staan zes fictieve regels in de
+  database. De afscherming is bewezen, de inhoud nog niet echt.
+- **Geen belastingtest, geen test met meerdere gelijktijdige gebruikers.**
+- **De Supabase-bibliotheek is niet vastgepind** (`@supabase/supabase-js@2` van een CDN).
+  Een wijziging daar komt ongezien in de pagina terecht.
+- **Wachtwoordbeleid en pogingenlimiet** zijn niet bekeken; dat is de standaard van
+  Supabase gebleven.
+
 ## Deel B — De app online zetten met GitHub Pages
 
 We doen bewust eerst alleen deze laag, zodat je de toegangscontrole op de gegevens
