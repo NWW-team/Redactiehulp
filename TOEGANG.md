@@ -21,46 +21,49 @@ staat er geen enkel geheim in.
 
 ## Stand van zaken (bijgewerkt 15 sep 2026)
 
-Alles wat vanuit de database kan, is **al gedaan en getest** in project
-`SSBNWW's Project` (`wmqketplyfscvcxxpnmb`). Deel A hieronder is grotendeels
-overbodig geworden; het staat er nog als naslag.
+**De hele Supabase-kant is klaar en geverifieerd** in project `SSBNWW's Project`
+(`wmqketplyfscvcxxpnmb`). Deel A hieronder is naslag geworden. Alleen deel B
+(Cloudflare) moet nog.
 
 **Wat er live staat**
 
-- Tabellen `toegestane_gebruiker` (allowlist op e-mailadres) en `schrijfwijzer_regel`,
-  allebei met RLS aan, één select-policy, en geen schrijfrechten voor `anon` of
-  `authenticated`.
+- `toegestane_gebruiker` (allowlist op e-mailadres) en `schrijfwijzer_regel`, allebei
+  met RLS aan, één select-policy, en geen schrijfrechten voor `anon` of `authenticated`.
 - Zes fictieve regels in `schrijfwijzer_regel`.
-- Twee adressen staan vooruit op de allowlist:
+- Trigger `beperk_registratie_tot_allowlist`: een account met een adres buiten de
+  allowlist kan niet worden aangemaakt, ook niet vanuit het dashboard. De beperking
+  zit in de database, niet in een schakelaar of een verborgen knop.
+- Trigger `koppel_allowlist_aan_account`: koppelt de allowlist-rij automatisch aan het
+  account zodra dat bestaat.
+- Twee testaccounts, allebei bevestigd en gekoppeld:
   `toegestaan.redacteur@example.com` (actief) en `geen.toegang@example.com` (niet actief).
-- Trigger `beperk_registratie_tot_allowlist`: een account met een adres dat niet op de
-  allowlist staat, kan **niet worden aangemaakt** — ook niet vanuit het dashboard.
-  De beperking zit dus in de database, niet in een schakelaar of een verborgen knop.
-- Trigger `koppel_allowlist_aan_account`: koppelt de allowlist-rij automatisch zodra
-  het account bestaat. Er hoeft achteraf niets meer gekoppeld te worden.
+- Project-URL en publishable key staan in `supabase-config.js`.
 
-**Wat er is getest** (proefinserts in een transactie die is teruggedraaid)
+**Getest met de echte accounts** (policies uitgevoerd onder de werkelijke user-id's)
 
-| Scenario | Uitkomst |
-|---|---|
-| Registratie met adres buiten de lijst | geweigerd door de trigger |
-| Registratie met adres op de lijst (andere hoofdletters) | toegelaten en automatisch gekoppeld |
-| Uitgelogd (`anon`) regels opvragen | 0 rijen |
-| Ingelogd en actief op de lijst | 6 regels, 1 eigen allowlist-rij |
-| Ingelogd maar niet actief | 0 regels |
-| Ingelogde gebruiker probeert een regel toe te voegen | geweigerd (`permission denied`) |
+| Scenario | Regels zichtbaar | Eigen allowlist-rij |
+|---|---|---|
+| A. uitgelogd (`anon`) | 0 | 0 |
+| B. `toegestaan.redacteur@example.com` | 6 | 1 |
+| C. `geen.toegang@example.com` | 0 | 1 (met `actief = false`) |
+| D. B probeert de allowlist-rij van C te lezen | 0 | — |
+| E. C probeert zichzelf actief te maken | geweigerd (`permission denied`) | — |
 
-Daarna gecontroleerd: `auth.users` is weer leeg, de allowlist-rijen zijn niet gekoppeld —
-de proef heeft niets achtergelaten.
+Eerder al getest met proefinserts in een teruggedraaide transactie: registratie buiten
+de allowlist wordt geweigerd, registratie erbinnen wordt toegelaten en automatisch
+gekoppeld, en een ingelogde gebruiker kan geen regels toevoegen.
+
+Security advisor: één melding, over `heeft_toegang()`. Die is bedoeld — de policy
+roept die functie aan, en hij geeft alleen een ja/nee over de aanroeper terug.
 
 **Wat er nog moet gebeuren**
 
 | Stap | Door wie |
 |---|---|
-| Twee testaccounts aanmaken in het dashboard | **jij** — alleen GoTrue kan wachtwoorden zetten |
-| Anon/publishable key in `supabase-config.js` | **jij** — sleuteltool is geblokkeerd in deze sessie |
-| "Allow new users to sign up" uitzetten | **jij**, optioneel — de trigger dekt dit al af |
-| Deel B: Cloudflare Pages + Access | **jij** — geen koppeling beschikbaar |
+| B1. Cloudflare Pages koppelen aan de repo | **jij** |
+| Testronde in de browser (deel C) | **jij** |
+| B2. Cloudflare Access ervoor zetten | **jij** |
+| Repo op private zetten (optioneel, voor "hele site privé") | **jij** |
 
 
 ---
