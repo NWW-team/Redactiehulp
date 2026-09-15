@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Redactiehulp — beveiligde versie</title>
+<style>
+  :root{
+    --blauw:#154273; --blauw-l:#e8f0f8; --rand:#d0d7de; --tekst:#1b1f23;
+    --fout:#b42318; --fout-bg:#fef3f2; --ok:#067647; --ok-bg:#ecfdf3;
+    --mut:#57606a; --let-op:#b54708; --let-op-bg:#fffaeb; --let-op-r:#fedf89;
+  }
+  *{box-sizing:border-box;}
+  body{
+    font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    max-width:900px; margin:0 auto; padding:24px 16px 64px;
+    color:var(--tekst); background:#fff; line-height:1.5;
+  }
+  h1{font-size:1.6rem; margin-bottom:4px;}
+  h2{font-size:1.15rem; margin-top:40px; border-bottom:2px solid var(--blauw); padding-bottom:6px;}
+  .disclaimer{
+    background:var(--let-op-bg); border:1px solid var(--let-op-r); border-radius:6px;
+    padding:10px 14px; font-size:.9rem; margin:12px 0 24px;
+  }
+  label{display:block; font-weight:600; margin:16px 0 6px;}
+  .hint{font-weight:400; color:var(--mut); font-size:.85rem; margin:-2px 0 6px;}
+  input[type=text], input[type=email], input[type=password], textarea, select{
+    width:100%; padding:8px 10px; border:1px solid var(--rand); border-radius:6px;
+    font-size:.95rem; font-family:inherit;
+  }
+  textarea{resize:vertical;}
+  button{
+    background:var(--blauw); color:#fff; border:none; padding:10px 18px;
+    border-radius:6px; font-size:.95rem; cursor:pointer; margin-top:12px;
+  }
+  button.secundair{background:#fff; color:var(--blauw); border:1px solid var(--blauw);}
+  button:hover{opacity:.9;}
+  button[disabled]{opacity:.5; cursor:progress;}
+  .balk{
+    display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between;
+    background:var(--blauw-l); border:1px solid #c7d9ea; border-radius:8px;
+    padding:10px 14px; margin-bottom:8px; font-size:.9rem;
+  }
+  .balk button{margin-top:0; padding:6px 14px; font-size:.85rem;}
+  .kaart{border:1px solid var(--rand); border-radius:10px; padding:20px 22px; margin-top:16px;}
+  .melding{border-radius:6px; padding:10px 12px; font-size:.9rem; margin-top:12px;}
+  .melding.fout{background:var(--fout-bg); border:1px solid #f3aca4; color:var(--fout);}
+  .melding.ok{background:var(--ok-bg); border:1px solid #abefc6; color:var(--ok);}
+  .melding.info{background:var(--blauw-l); border:1px solid #c7d9ea; color:var(--blauw);}
+  .issue{
+    background:var(--fout-bg); border:1px solid #f3aca4; border-radius:6px;
+    padding:10px 12px; margin-bottom:8px; font-size:.9rem;
+  }
+  .issue .titel{font-weight:600; color:var(--fout);}
+  .issue .fragment{font-style:italic; color:#444; margin-top:2px;}
+  .issue .bron{color:#6e7781; font-size:.8rem; margin-top:2px;}
+  .geen-issues{background:var(--ok-bg); border:1px solid #abefc6; color:var(--ok); border-radius:6px; padding:10px 12px; font-size:.9rem;}
+  .telling{font-size:.85rem; color:var(--mut); margin-bottom:8px;}
+  .badge{display:inline-block; background:var(--blauw); color:#fff; border-radius:999px; padding:2px 10px; font-size:.8rem;}
+  .vergelijking{display:flex; gap:16px; margin-top:12px; flex-wrap:wrap;}
+  .vergelijking > div{flex:1; min-width:220px;}
+  details{margin-top:24px; border:1px solid var(--rand); border-radius:8px; padding:10px 14px;}
+  summary{cursor:pointer; font-weight:600; font-size:.9rem;}
+  pre{
+    background:#f6f8fa; border:1px solid var(--rand); border-radius:6px;
+    padding:10px; overflow-x:auto; font-size:.8rem; white-space:pre-wrap; word-break:break-word;
+  }
+  footer{margin-top:48px; font-size:.8rem; color:#6e7781;}
+  [hidden]{display:none !important;}
+</style>
+</head>
+<body>
+
+<h1>Redactiehulp</h1>
+<p>Beveiligde versie: de regelset staat in Supabase en is alleen te lezen door vooraf toegestane accounts.</p>
+
+<div class="disclaimer">
+  <strong>Wat deze pagina wel en niet beschermt.</strong> Deze HTML en JavaScript zijn publiek — wie het bestand
+  kan opvragen, kan de code lezen. De bescherming zit op twee plekken daarbuiten:
+  <strong>Cloudflare Access</strong> staat vóór de bestanden en bepaalt wie de pagina überhaupt krijgt, en de
+  <strong>RLS-policies in Supabase</strong> staan vóór de gegevens en bepalen wie de regelset mag lezen.
+  Het inlogformulier hieronder is de bediening daarvan, niet de beveiliging zelf.
+  De regelset in dit project is <strong>fictief</strong>, niet de officiële NWW-schrijfwijzer.
+</div>
+
+<!-- ======================= configuratie ontbreekt ======================= -->
+<div id="setup-scherm" hidden>
+  <div class="melding fout">
+    <strong>Nog niet ingesteld.</strong> Vul eerst je projectgegevens in <code>supabase-config.js</code> in:
+    de Project URL en de anon/publishable key uit Supabase → Project Settings → API Keys.
+    Zet daar geen service-role key of databasewachtwoord in.
+  </div>
+</div>
+
+<!-- ============================== inloggen ============================== -->
+<div id="login-scherm" hidden>
+  <h2>Inloggen</h2>
+  <p>Toegang is beperkt tot vooraf aangemaakte accounts. Er is geen registratie: aanmelden kan alleen
+     als een beheerder je account heeft aangemaakt én op de toegangslijst heeft gezet.</p>
+  <form id="login-form" class="kaart" autocomplete="on">
+    <label for="email">E-mailadres</label>
+    <input type="email" id="email" name="email" autocomplete="username" required placeholder="naam@voorbeeld.nl">
+
+    <label for="wachtwoord">Wachtwoord</label>
+    <input type="password" id="wachtwoord" name="password" autocomplete="current-password" required>
+
+    <button type="submit" id="login-knop">Inloggen</button>
+    <div id="login-melding"></div>
+  </form>
+</div>
+
+<!-- ============================ geen toegang ============================ -->
+<div id="geen-toegang-scherm" hidden>
+  <h2>Geen toegang</h2>
+  <div class="melding fout">
+    <strong>Je bent ingelogd, maar dit account staat niet op de toegangslijst.</strong>
+    De database geeft daarom geen regelset vrij. Vraag een beheerder om je account toe te voegen.
+  </div>
+  <p class="hint">Ingelogd als <span id="geen-toegang-email"></span>.</p>
+  <button class="secundair" type="button" data-uitloggen>Uitloggen</button>
+</div>
+
+<!-- =============================== de app =============================== -->
+<div id="app-scherm" hidden>
+  <div class="balk">
+    <span>Ingelogd als <strong id="app-email"></strong> · <span id="regel-telling"></span></span>
+    <button class="secundair" type="button" data-uitloggen>Uitloggen</button>
+  </div>
+
+  <h2>1. Tekst invoeren en controleren</h2>
+
+  <label for="titel">Titel</label>
+  <div class="hint">Richtlijn uit de (fictieve) regelset: beperkt aantal tekens, geen leestekens behalve een vraagteken.</div>
+  <input type="text" id="titel" placeholder="Bijv.: Hoe vraag ik een nieuw paspoort aan?">
+
+  <label for="intro">Introductie</label>
+  <div class="hint">Het korte antwoord bovenaan de pagina.</div>
+  <textarea id="intro" rows="3" placeholder="Korte introductietekst..."></textarea>
+
+  <label for="hoofdtekst">Hoofdtekst</label>
+  <div class="hint">Zet een tussenkop op een eigen regel die begint met <code>##</code>.</div>
+  <textarea id="hoofdtekst" rows="10" placeholder="Plak of typ hier de concepttekst..."></textarea>
+
+  <button type="button" id="controleer-knop">Controleer tekst</button>
+  <div id="resultaten-invoer"></div>
+
+  <h2>2. Prompt genereren voor Claude.ai</h2>
+  <p>Deze stap bouwt een prompt met de regelset, je taak en de ingevoerde tekst. De AI doet het (her)schrijven in Claude.ai.</p>
+
+  <label for="taak">Taak</label>
+  <select id="taak">
+    <option value="nieuw">Nieuwe tekst schrijven op basis van de invoer</option>
+    <option value="verbeteren">Bestaande tekst verbeteren/aanvullen</option>
+    <option value="herschrijven">Pagina volledig herschrijven</option>
+  </select>
+
+  <button type="button" id="prompt-knop">Genereer prompt</button>
+
+  <div id="prompt-sectie" hidden>
+    <label for="prompt-output">Gegenereerde prompt</label>
+    <textarea id="prompt-output" rows="10" readonly></textarea>
+    <button class="secundair" type="button" id="kopieer-knop">Kopieer prompt</button>
+    <span id="kopieer-status" class="hint"></span>
+  </div>
+
+  <h2>3. AI-resultaat terugplakken en vergelijken</h2>
+  <label for="ai-output">Herschreven tekst (uit Claude.ai)</label>
+  <textarea id="ai-output" rows="10" placeholder="Plak hier de AI-output..."></textarea>
+  <button type="button" id="vergelijk-knop">Vergelijk met origineel</button>
+  <div id="resultaten-vergelijking"></div>
+</div>
+
+<!-- ============================== diagnose ============================== -->
+<details id="diagnose" hidden>
+  <summary>Toegang zelf testen (direct gegevensverzoek)</summary>
+  <p class="hint">
+    Deze knop vraagt de regelset rechtstreeks bij de database op, buiten de app-logica om, met dezelfde
+    publieke sleutel die in de frontend staat. Zo zie je wat de policies teruggeven in plaats van wat de
+    pagina toont. Uitgelogd of zonder toegang hoort het antwoord een lege lijst te zijn — dat is de policy
+    die werkt, geen storing.
+  </p>
+  <button class="secundair" type="button" id="diagnose-knop">Doe een direct gegevensverzoek</button>
+  <pre id="diagnose-uitvoer">nog niet uitgevoerd</pre>
+</details>
+
+<footer>
+  Redactiehulp — beveiligde demo. Regelset is fictief. Deze pagina slaat zelf niets op behalve de
+  Supabase-sessie in je browser; uitloggen wist die.
+</footer>
+
+<script src="supabase-config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+/* ===========================================================================
+   Opzet
+   ---------------------------------------------------------------------------
+   De frontend beslist niets over toegang. Hij vraagt gegevens op en toont wat
+   de database teruggeeft. Staat een account niet op de allowlist, dan komen er
+   geen regels terug en is er niets te tonen — dat is de beveiliging, het
+   verbergen van schermen is alleen de afwerking.
+   =========================================================================== */
+
+const schermen = {
+  setup:       document.getElementById("setup-scherm"),
+  login:       document.getElementById("login-scherm"),
+  geenToegang: document.getElementById("geen-toegang-scherm"),
+  app:         document.getElementById("app-scherm")
+};
+
+function toon(naam){
+  Object.entries(schermen).forEach(([k, el]) => { el.hidden = (k !== naam); });
+  document.getElementById("diagnose").hidden = (naam === "setup");
+}
+
+/* --------------------------- configuratie --------------------------- */
+const cfg = window.SUPABASE_CONFIG || {};
+const configOk = cfg.url && cfg.anonKey &&
+                 !String(cfg.url).startsWith("VUL_IN") &&
+                 !String(cfg.anonKey).startsWith("VUL_IN");
+
+let client = null;
+if (!configOk){
+  toon("setup");
+} else if (!window.supabase || !window.supabase.createClient){
+  toon("setup");
+  schermen.setup.querySelector(".melding").innerHTML =
+    "<strong>De Supabase-bibliotheek is niet geladen.</strong> Controleer of het CDN bereikbaar is " +
+    "(of zet een eigen kopie van supabase-js naast dit bestand).";
+} else {
+  client = window.supabase.createClient(cfg.url, cfg.anonKey);
+  start();
+}
+
+/* ------------------------------ regelset ----------------------------- */
+let REGELS = [];   // alleen gevuld zolang er een geldige, toegestane sessie is
+
+function wisAlles(){
+  REGELS = [];
+  ["resultaten-invoer", "resultaten-vergelijking"].forEach(id => {
+    const el = document.getElementById(id); if (el) el.innerHTML = "";
+  });
+  ["titel", "intro", "hoofdtekst", "ai-output", "prompt-output"].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = "";
+  });
+  const ps = document.getElementById("prompt-sectie"); if (ps) ps.hidden = true;
+  document.getElementById("diagnose-uitvoer").textContent = "nog niet uitgevoerd";
+}
+
+/* ------------------------------- sessie ------------------------------ */
+async function start(){
+  const { data } = await client.auth.getSession();
+  await verwerkSessie(data.session);
+
+  client.auth.onAuthStateChange((event, session) => { verwerkSessie(session); });
+
+  document.getElementById("login-form").addEventListener("submit", inloggen);
+  document.querySelectorAll("[data-uitloggen]").forEach(b => b.addEventListener("click", uitloggen));
+  document.getElementById("controleer-knop").addEventListener("click", controleer);
+  document.getElementById("prompt-knop").addEventListener("click", genereerPrompt);
+  document.getElementById("kopieer-knop").addEventListener("click", kopieerPrompt);
+  document.getElementById("vergelijk-knop").addEventListener("click", vergelijk);
+  document.getElementById("diagnose-knop").addEventListener("click", diagnose);
+}
+
+async function verwerkSessie(sessie){
+  if (!sessie){ wisAlles(); toon("login"); return; }
+
+  const email = sessie.user.email || "(onbekend)";
+
+  // 1. Staat dit account op de allowlist? De database antwoordt, niet de frontend.
+  const { data: rij, error: allowFout } = await client
+    .from("toegestane_gebruiker")
+    .select("email, rol, actief")
+    .maybeSingle();
+
+  if (allowFout){
+    wisAlles();
+    document.getElementById("geen-toegang-email").textContent = email;
+    toon("geenToegang");
+    return;
+  }
+
+  if (!rij || !rij.actief){
+    wisAlles();
+    document.getElementById("geen-toegang-email").textContent = email;
+    toon("geenToegang");
+    return;
+  }
+
+  // 2. Regelset ophalen. Lukt dit niet, dan valt er niets te controleren.
+  const { data: regels, error: regelFout } = await client
+    .from("schrijfwijzer_regel")
+    .select("*")
+    .eq("actief", true)
+    .order("volgorde");
+
+  if (regelFout || !regels || regels.length === 0){
+    wisAlles();
+    document.getElementById("geen-toegang-email").textContent = email;
+    toon("geenToegang");
+    return;
+  }
+
+  REGELS = regels;
+  document.getElementById("app-email").textContent = email;
+  document.getElementById("regel-telling").textContent =
+    regels.length + " regels geladen (versie " + (regels[0].regelset_versie || "onbekend") + ")";
+  toon("app");
+}
+
+async function inloggen(e){
+  e.preventDefault();
+  const knop = document.getElementById("login-knop");
+  const melding = document.getElementById("login-melding");
+  melding.className = ""; melding.textContent = "";
+  knop.disabled = true;
+
+  const { error } = await client.auth.signInWithPassword({
+    email: document.getElementById("email").value.trim(),
+    password: document.getElementById("wachtwoord").value
+  });
+
+  knop.disabled = false;
+  document.getElementById("wachtwoord").value = "";
+
+  if (error){
+    melding.className = "melding fout";
+    melding.textContent = "Inloggen mislukt: " + error.message;
+  }
+}
+
+async function uitloggen(){
+  await client.auth.signOut();
+  wisAlles();
+  toon("login");
+}
+
+/* --------------------------- direct verzoek -------------------------- */
+async function diagnose(){
+  const uit = document.getElementById("diagnose-uitvoer");
+  uit.textContent = "bezig...";
+  const { data: { session } } = await client.auth.getSession();
+  const res = await fetch(cfg.url + "/rest/v1/schrijfwijzer_regel?select=id,titel", {
+    headers: {
+      apikey: cfg.anonKey,
+      Authorization: "Bearer " + (session ? session.access_token : cfg.anonKey)
+    }
+  });
+  const tekst = await res.text();
+  uit.textContent =
+    "sessie:    " + (session ? session.user.email : "niet ingelogd") + "\n" +
+    "status:    " + res.status + " " + res.statusText + "\n" +
+    "antwoord:  " + tekst.slice(0, 600);
+}
+
+/* ======================= regelcheck op DB-regels ====================== */
+function telWoorden(t){ return (t || "").trim().split(/\s+/).filter(Boolean).length; }
+function naarZinseinde(t){
+  const s = (t || "").trim(); if (!s) return "";
+  return /[.!?]\s*$/.test(s) ? s : s + ".";
+}
+function zinnen(t){
+  const m = (t || "").match(/[^.!?]+[.!?]+|[^.!?]+$/g);
+  return m ? m.map(z => z.trim()).filter(Boolean) : [];
+}
+function splitsKoppenEnTekst(t){
+  const koppen = [], body = [];
+  (t || "").split("\n").forEach(r => {
+    const s = r.trim();
+    if (/^##\s+/.test(s)) koppen.push(s.replace(/^##\s+/, "")); else body.push(r);
+  });
+  return { koppen, bodyTekst: body.join("\n") };
+}
+function vindPatroon(tekst, regex){
+  const uit = []; if (!tekst) return uit;
+  let m;
+  while ((m = regex.exec(tekst)) !== null){
+    const start = Math.max(0, m.index - 25);
+    const eind  = Math.min(tekst.length, m.index + m[0].length + 25);
+    uit.push({ context: "…" + tekst.slice(start, eind).trim() + "…" });
+    if (m.index === regex.lastIndex) regex.lastIndex++;
+  }
+  return uit;
+}
+function escapeRegex(s){ return String(s).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+
+/* Elke regel uit de database heeft een type; de logica per type staat hier. */
+const CONTROLES = {
+  max_tekens(v, p){
+    if (!v) return [];
+    const max = p.max || 60;
+    return v.length > max ? [{ fragment: v, detail: v.length + " tekens (richtlijn: max. " + max + ")" }] : [];
+  },
+  geen_leestekens(v, p){
+    if (!v) return [];
+    const slot = p.toegestaan_slot || "?";
+    const zonder = v.replace(new RegExp(escapeRegex(slot) + "\\s*$"), "");
+    return /[.,;:!]/.test(zonder)
+      ? [{ fragment: v, detail: "Gebruik geen leestekens, behalve “" + slot + "” aan het eind." }] : [];
+  },
+  max_woorden(v, p){
+    if (!v) return [];
+    const max = p.max || 40, n = telWoorden(v);
+    return n > max ? [{ fragment: v.slice(0, 60) + "…", detail: n + " woorden (richtlijn: max. " + max + ")" }] : [];
+  },
+  max_woorden_per_zin(v, p){
+    const max = p.max || 18;
+    return zinnen(v).filter(z => telWoorden(z) > max)
+      .map(z => ({ fragment: z.trim(), detail: telWoorden(z) + " woorden (richtlijn: max. " + max + ")" }));
+  },
+  verboden_woord(v, p){
+    const woord = p.woord || "";
+    if (!woord) return [];
+    const re = new RegExp("\\b" + escapeRegex(woord) + "\\b", "gi");
+    return vindPatroon(v, re).map(m => ({
+      fragment: m.context,
+      detail: p.alternatief ? "Gebruik liever “" + p.alternatief + "”." : "Vermijd dit woord."
+    }));
+  },
+  max_woorden_kop(koppen, p){
+    const max = p.max || 6;
+    return (koppen || []).filter(k => telWoorden(k) > max)
+      .map(k => ({ fragment: k, detail: telWoorden(k) + " woorden (richtlijn: max. " + max + ")" }));
+  }
+};
+
+function voerControleUit(titelWaarde, introWaarde, hoofdtekstWaarde){
+  if (REGELS.length === 0) return null;           // geen regelset = geen oordeel
+  const { koppen, bodyTekst } = splitsKoppenEnTekst(hoofdtekstWaarde);
+  const issues = [];
+
+  REGELS.forEach(regel => {
+    const fn = CONTROLES[regel.type];
+    if (!fn) return;
+
+    let invoer;
+    if (regel.scope === "titel")      invoer = titelWaarde;
+    else if (regel.scope === "intro") invoer = introWaarde;
+    else if (regel.scope === "kop")   invoer = koppen;
+    else invoer = [naarZinseinde(titelWaarde), naarZinseinde(introWaarde), bodyTekst].filter(Boolean).join("\n\n");
+
+    let gevonden = [];
+    try { gevonden = fn(invoer, regel.parameters || {}) || []; } catch (e) { gevonden = []; }
+    gevonden.forEach(g => issues.push({
+      ...g, ruleId: regel.id, titel: regel.titel, categorie: regel.categorie, bron: regel.bron
+    }));
+  });
+  return issues;
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+}
+
+function renderIssues(issues, containerId){
+  const el = document.getElementById(containerId);
+  if (issues === null){
+    el.innerHTML = '<div class="melding fout">Geen regelset geladen — log opnieuw in.</div>';
+    return;
+  }
+  if (issues.length === 0){
+    el.innerHTML = '<div class="geen-issues">Geen aandachtspunten gevonden op basis van de geladen regelset.</div>';
+    return;
+  }
+  el.innerHTML = '<div class="telling">' + issues.length + ' aandachtspunt(en) gevonden</div>' +
+    issues.map(i => '<div class="issue">' +
+      '<div class="titel">' + escapeHtml(i.titel) + ' <span class="badge">' + escapeHtml(i.categorie) + '</span></div>' +
+      '<div class="fragment">' + escapeHtml(i.fragment) + '</div>' +
+      '<div>' + escapeHtml(i.detail) + '</div>' +
+      '<div class="bron">Bron: ' + escapeHtml(i.bron) + '</div>' +
+    '</div>').join("");
+}
+
+function controleer(){
+  renderIssues(voerControleUit(
+    document.getElementById("titel").value,
+    document.getElementById("intro").value,
+    document.getElementById("hoofdtekst").value
+  ), "resultaten-invoer");
+}
+
+/* ---------------------------- promptgenerator ------------------------- */
+function genereerPrompt(){
+  if (REGELS.length === 0) return;
+  const titel = document.getElementById("titel").value.trim();
+  const intro = document.getElementById("intro").value.trim();
+  const hoofdtekst = document.getElementById("hoofdtekst").value.trim();
+  const taakTekst = {
+    nieuw: "Schrijf op basis van onderstaande input een nieuwe webtekst.",
+    verbeteren: "Verbeter en vul onderstaande bestaande tekst aan, met behoud van de kernboodschap.",
+    herschrijven: "Herschrijf onderstaande pagina volledig, met behoud van de feitelijke inhoud."
+  }[document.getElementById("taak").value];
+
+  const prompt = [
+    "Je bent een redacteur die webteksten schrijft volgens onderstaande schrijfwijzerregels.",
+    "", "Regels waar de tekst aan moet voldoen:",
+    REGELS.map(r => "- " + r.titel + " (" + r.categorie + ")" + (r.uitleg ? " — " + r.uitleg : "")).join("\n"),
+    "", "Taak:", taakTekst,
+    "", "Titel (indien aanwezig):", titel || "(geen titel meegegeven)",
+    "", "Introductie (indien aanwezig):", intro || "(geen introductie meegegeven)",
+    "", "Tekst:", hoofdtekst || "(geen tekst meegegeven)",
+    "", "Geef de herschreven/nieuwe tekst terug, met titel, introductie en tussenkoppen duidelijk gemarkeerd."
+  ].join("\n");
+
+  document.getElementById("prompt-output").value = prompt;
+  document.getElementById("prompt-sectie").hidden = false;
+  document.getElementById("kopieer-status").textContent = "";
+}
+
+function kopieerPrompt(){
+  const ta = document.getElementById("prompt-output");
+  const status = document.getElementById("kopieer-status");
+  ta.focus(); ta.select();
+  if (navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(ta.value)
+      .then(() => { status.textContent = "Gekopieerd ✓"; })
+      .catch(() => { status.textContent = "Kopiëren niet gelukt — gebruik Ctrl+C."; });
+  } else {
+    status.textContent = "Kopiëren niet gelukt — gebruik Ctrl+C.";
+  }
+}
+
+/* ------------------------------ vergelijken --------------------------- */
+function vergelijk(){
+  const voor = voerControleUit(
+    document.getElementById("titel").value,
+    document.getElementById("intro").value,
+    document.getElementById("hoofdtekst").value
+  );
+  const na = voerControleUit("", "", document.getElementById("ai-output").value);
+  const el = document.getElementById("resultaten-vergelijking");
+  if (voor === null || na === null){
+    el.innerHTML = '<div class="melding fout">Geen regelset geladen — log opnieuw in.</div>';
+    return;
+  }
+  el.innerHTML =
+    '<div class="vergelijking">' +
+      '<div><div class="telling"><strong>Vóór</strong> — ' + voor.length + ' aandachtspunt(en)</div><div id="vergelijk-voor"></div></div>' +
+      '<div><div class="telling"><strong>Na</strong> (AI-output) — ' + na.length + ' aandachtspunt(en)</div><div id="vergelijk-na"></div></div>' +
+    '</div>';
+  renderIssues(voor, "vergelijk-voor");
+  renderIssues(na, "vergelijk-na");
+}
+</script>
+</body>
+</html>

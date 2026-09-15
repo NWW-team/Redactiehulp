@@ -21,6 +21,19 @@ Open `index.html` gewoon in een browser (dubbelklikken, of via een GitHub Pages-
 3. Klik op "Genereer prompt" om een kant-en-klare prompt te maken; kopieer deze naar Claude.ai.
 4. Plak de AI-output terug bij stap 3 op de pagina om vóór/na te vergelijken.
 
+## Beveiligde versie (app.html)
+
+Naast de open demo `index.html` staat er een afgeschermde versie: `app.html`. Daar staat de
+regelset niet in het bestand maar in Supabase, achter RLS-policies, en komt hij pas binnen na
+inloggen met een vooraf toegestaan account. De bijbehorende SQL staat in `supabase/`; de
+stap-voor-stap-instructies voor Supabase en Cloudflare, plus het testscript, staan in
+[`TOEGANG.md`](TOEGANG.md).
+
+Twee dingen om niet te verwarren: `app.html` en de JavaScript erin zijn gewoon publieke
+frontendbestanden — de bescherming zit in Cloudflare Access (vóór de bestanden) en in de
+RLS-policies (vóór de gegevens). In `supabase-config.js` hoort alleen de project-URL en de
+anon/publishable key; nooit een service-role key, secret key of databasewachtwoord.
+
 ## Regelset aanpassen
 
 Pas het `RULES`-blok bovenaan het `<script>`-gedeelte van `index.html` aan. Elke regel is een object met `id`, `titel`, `categorie`, `bron`, `scope` (`titel`, `intro` of `tekst`) en een `check(waarde)`-functie die een lijst gevonden aandachtspunten teruggeeft. De rest van de pagina (UI, promptgenerator, vergelijking) hoeft niet aangepast te worden.
