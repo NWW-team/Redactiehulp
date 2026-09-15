@@ -15,6 +15,6 @@
    ============================================================================= */
 
 window.SUPABASE_CONFIG = {
-  url:     "VUL_IN__https://<projectref>.supabase.co",
-  anonKey: "VUL_IN__anon_of_publishable_key"
+  url:     "https://wmqketplyfscvcxxpnmb.supabase.co",
+  anonKey: "VUL_IN__anon_of_publishable_key"   // <- alleen deze regel moet nog
 };

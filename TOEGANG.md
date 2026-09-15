@@ -19,6 +19,37 @@ staat er geen enkel geheim in.
 
 ---
 
+## Stand van zaken (bijgewerkt 15 sep 2026)
+
+Het databasewerk is **al uitgevoerd** in project `SSBNWW's Project`
+(`wmqketplyfscvcxxpnmb`, eu-west-1) via de Supabase-koppeling. Je hoeft stap A3,
+A4-voorbereiding en de project-URL niet meer zelf te doen.
+
+| Stap | Status |
+|---|---|
+| A1. Registratie uitzetten | **jij** — kan alleen in het dashboard |
+| A2. Twee testaccounts aanmaken | **jij** — kan alleen in het dashboard |
+| A3. Tabellen, policies, functie, revokes | klaar en geverifieerd |
+| A4. Account op de allowlist zetten | wacht op A2 |
+| A5. Project-URL in `supabase-config.js` | klaar |
+| A5. Anon/publishable key | **jij** — ophalen werd geblokkeerd, zie hieronder |
+| Deel B. Cloudflare | **jij** — geen koppeling beschikbaar |
+
+Geverifieerd na het aanmaken:
+
+```
+tabel                  rls_aan  policies  schrijfrechten anon/authenticated
+schrijfwijzer_regel    true     1         geen
+toegestane_gebruiker   true     1         geen
+```
+
+Zes fictieve regels staan in `schrijfwijzer_regel`. De allowlist is nog leeg — dus op
+dit moment krijgt *niemand* de regelset te zien, ook een ingelogd account niet. Dat is
+de juiste beginstand.
+
+
+---
+
 ## Deel A — Supabase (ongeveer 10 minuten)
 
 ### A1. Registratie uitzetten
