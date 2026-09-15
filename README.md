@@ -20,10 +20,14 @@ Voor het echte gebruik is er een losse HTML-versie met de echte regelset, die ni
 
 Open `index.html` gewoon in een browser (dubbelklikken, of via een GitHub Pages-link als die voor de demo is ingeschakeld). Geen installatie nodig.
 
-1. Vul titel, introductie en/of hoofdtekst in.
+1. Plak de hele tekst (titel + introductie + hoofdtekst) in 1 keer in het tekstveld — er is bewust maar 1 invoerveld, geen aparte velden voor titel/introductie.
 2. Klik op "Controleer" voor directe, regelgebaseerde feedback.
-3. Klik op "Verbeter", bekijk de voorstellen, vink af wat je wilt overnemen en klik op "Neem geselecteerde verbeteringen over".
+3. Klik op "Verbeter", bekijk de voorstellen, vink af wat je wilt overnemen en klik op "Neem over".
 4. Optioneel (zolang "Herschrijf" nog niet gebouwd is): klap "Alternatief: prompt kopiëren en resultaat terugplakken" open, genereer een prompt, plak die in Claude.ai en plak het antwoord terug om vóór/na te vergelijken.
+
+### Hoe titel/introductie/hoofdtekst worden herkend
+
+`herkenTitelIntroUitTekst()` splitst het ene tekstveld: met labels ("Titel"/"Introductie"/"Hoofdtekst" of "Tekst", elk op een eigen regel) is de indeling expliciet; zonder labels geldt de vuistregel "1e regel = titel, 2e regel = introductie, de rest is hoofdtekst". Die vuistregel hoeft niet perfect te zijn — Controleer wijst vanzelf op een titel die te lang is als de indeling een keer misgaat.
 
 ## Regelset aanpassen
 

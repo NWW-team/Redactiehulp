@@ -85,26 +85,6 @@
   button.uit, button.uit:hover { background: #eee; color: #8a8a8a; cursor: not-allowed; border: 1px solid var(--rand); }
   .knoppenrij { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 12px; }
   .toelichting { font-size: 0.8rem; color: #5c5c5c; margin-top: 6px; }
-  .herken-melding {
-    background: var(--blauw-licht);
-    color: var(--blauw-donker);
-    border-radius: var(--radius);
-    padding: 7px 10px;
-    font-size: 0.82rem;
-    margin-top: 6px;
-  }
-  .link-knop {
-    background: none;
-    border: none;
-    color: var(--blauw-donker);
-    text-decoration: underline;
-    padding: 0;
-    font-weight: 600;
-    font-size: inherit;
-    cursor: pointer;
-    margin-left: 4px;
-  }
-  .link-knop:hover { background: none; color: var(--blauw); }
   .resultaten { margin-top: 14px; }
   .telling { font-size: 0.82rem; color: #5c5c5c; margin-bottom: 8px; }
   .groepskop { font-weight: 700; margin: 16px 0 6px; font-size: 0.85rem; }
@@ -183,19 +163,9 @@
 
 <h2><span class="stapnummer">1</span>Controleren</h2>
 
-<label for="titel">Titel</label>
-<input type="text" id="titel" placeholder="Bijv.: Hoe vraag ik een nieuw paspoort aan?">
-
-<label for="intro">Introductie</label>
-<textarea id="intro" rows="3" placeholder="Korte introductietekst..."></textarea>
-
-<label for="hoofdtekst">Hoofdtekst</label>
-<div class="hint">Tip: plak hier gerust de hele pagina in 1 keer (titel + introductie + tekst) — bij lege Titel/Introductie wordt dat automatisch verdeeld. Tussenkop? Begin de regel met <code>##</code>.</div>
-<textarea id="hoofdtekst" rows="12" placeholder="Plak of typ hier de conceptletekst..." onpaste="verwerkPlakInHoofdtekst()"></textarea>
-<div class="herken-melding" id="herken-melding" hidden>
-  Titel en introductie automatisch herkend en ingevuld.
-  <button type="button" class="link-knop" onclick="ongedaanMakenHerkenning()">Ongedaan maken</button>
-</div>
+<label for="tekst">Tekst</label>
+<div class="hint">Plak de hele pagina in 1 keer — titel, introductie en hoofdtekst. De app herkent dit zelf (1e regel = titel, 2e regel = introductie, de rest is hoofdtekst). Tussenkop? Begin de regel met <code>##</code>.</div>
+<textarea id="tekst" rows="16" placeholder="Plak of typ hier de hele conceptletekst, inclusief titel en introductie..."></textarea>
 
 <div class="knoppenrij">
   <button onclick="controleer()">Controleer</button>
@@ -581,9 +551,9 @@ function escapeHtml(s) {
 }
 
 /* ==========================================================================
-   Titel/introductie herkennen als de redacteur alles in 1 keer in de
-   hoofdtekst plakt (bijv. de hele tekst van een live pagina). Bespaart het
-   apart moeten kopiëren van 3 losse stukjes tekst.
+   Titel/introductie/hoofdtekst herkennen uit het ene tekstveld. Er is met
+   opzet maar 1 invoerveld (geen aparte velden voor titel/introductie): dat
+   was verwarrend, en de redacteur plakt zo de hele pagina in 1 keer.
 
    Met labels ("Titel"/"Introductie"/"Hoofdtekst" of "Tekst", elk op een
    eigen regel) is de indeling expliciet — zelfde conventie als bij het
@@ -631,42 +601,12 @@ function herkenTitelIntroUitTekst(tekst) {
   return { titel, intro, hoofdtekst };
 }
 
-let ONGEDAAN_MAKEN_HOOFDTEKST = null;
-
-function verwerkPlakInHoofdtekst() {
-  const titelVeld = document.getElementById("titel");
-  const introVeld = document.getElementById("intro");
-  // Bestaande titel/introductie nooit overschrijven.
-  if (titelVeld.value.trim() || introVeld.value.trim()) return;
-
-  // setTimeout: wacht tot de geplakte tekst echt in het veld staat.
-  setTimeout(() => {
-    const hoofdtekstVeld = document.getElementById("hoofdtekst");
-    const geplakt = hoofdtekstVeld.value;
-    const herkend = herkenTitelIntroUitTekst(geplakt);
-    if (!herkend.titel || (!herkend.intro && !herkend.hoofdtekst)) return; // te weinig te verdelen
-
-    ONGEDAAN_MAKEN_HOOFDTEKST = geplakt;
-    titelVeld.value = herkend.titel;
-    introVeld.value = herkend.intro;
-    hoofdtekstVeld.value = herkend.hoofdtekst;
-    document.getElementById("herken-melding").hidden = false;
-  }, 0);
-}
-
-function ongedaanMakenHerkenning() {
-  if (ONGEDAAN_MAKEN_HOOFDTEKST === null) return;
-  document.getElementById("titel").value = "";
-  document.getElementById("intro").value = "";
-  document.getElementById("hoofdtekst").value = ONGEDAAN_MAKEN_HOOFDTEKST;
-  document.getElementById("herken-melding").hidden = true;
-  ONGEDAAN_MAKEN_HOOFDTEKST = null;
+function huidigeOnderdelen() {
+  return herkenTitelIntroUitTekst(document.getElementById("tekst").value);
 }
 
 function controleer() {
-  const titel = document.getElementById("titel").value;
-  const intro = document.getElementById("intro").value;
-  const hoofdtekst = document.getElementById("hoofdtekst").value;
+  const { titel, intro, hoofdtekst } = huidigeOnderdelen();
   const issues = voerControleUit(titel, intro, hoofdtekst);
   renderIssues(issues, "resultaten-invoer");
 }
@@ -754,10 +694,10 @@ function vindVerbeterVoorstellen(titel, intro, hoofdtekst) {
 
 let LAATSTE_VOORSTELLEN = [];
 
+const VELDNAMEN = { titel: "titel", intro: "introductie", hoofdtekst: "hoofdtekst" };
+
 function verbeter() {
-  const titel = document.getElementById("titel").value;
-  const intro = document.getElementById("intro").value;
-  const hoofdtekst = document.getElementById("hoofdtekst").value;
+  const { titel, intro, hoofdtekst } = huidigeOnderdelen();
   LAATSTE_VOORSTELLEN = vindVerbeterVoorstellen(titel, intro, hoofdtekst);
 
   const container = document.getElementById("verbeter-voorstellen");
@@ -778,7 +718,7 @@ function verbeter() {
           <label for="${v.id}" style="display:inline; font-weight:400;">
             <span class="van">${escapeHtml(v.zoek)}</span> → <span class="naar">${escapeHtml(v.vervang)}</span>
           </label>
-          <div class="omschrijving">${escapeHtml(v.omschrijving)} (${escapeHtml(v.veld)})</div>
+          <div class="omschrijving">${escapeHtml(v.omschrijving)} (${escapeHtml(VELDNAMEN[v.veld] || v.veld)})</div>
         </div>
       </div>
     `).join("");
@@ -786,22 +726,23 @@ function verbeter() {
 }
 
 function neemVerbeteringenOver() {
-  const velden = { titel: document.getElementById("titel"), intro: document.getElementById("intro"), hoofdtekst: document.getElementById("hoofdtekst") };
-  const huidigeWaarden = { titel: velden.titel.value, intro: velden.intro.value, hoofdtekst: velden.hoofdtekst.value };
+  // Alle voorstellen (titel/intro/hoofdtekst) zijn stukjes van hetzelfde,
+  // ene tekstveld — dus rechtstreeks toepassen op de volledige tekst houdt
+  // de oorspronkelijke opmaak (regels, eventuele labels) vanzelf intact.
+  const tekstVeld = document.getElementById("tekst");
+  let huidigeTekst = tekstVeld.value;
   let aantalToegepast = 0;
 
   LAATSTE_VOORSTELLEN.forEach(v => {
     const checkbox = document.getElementById(v.id);
     if (!checkbox || !checkbox.checked) return;
-    if (huidigeWaarden[v.veld].includes(v.zoek)) {
-      huidigeWaarden[v.veld] = huidigeWaarden[v.veld].replace(v.zoek, v.vervang);
+    if (huidigeTekst.includes(v.zoek)) {
+      huidigeTekst = huidigeTekst.replace(v.zoek, v.vervang);
       aantalToegepast++;
     }
   });
 
-  velden.titel.value = huidigeWaarden.titel;
-  velden.intro.value = huidigeWaarden.intro;
-  velden.hoofdtekst.value = huidigeWaarden.hoofdtekst;
+  tekstVeld.value = huidigeTekst;
 
   document.getElementById("verbeter-voorstellen").innerHTML =
     `<div class="geen-voorstellen">${aantalToegepast} verbetering(en) overgenomen in de tekst hierboven. Klik nogmaals op "Verbeter" om te zien wat er nog overblijft, of ga verder met "Controleer".</div>`;
@@ -816,9 +757,7 @@ function bouwRegelsSamenvatting() {
 }
 
 function genereerPrompt() {
-  const titel = document.getElementById("titel").value.trim();
-  const intro = document.getElementById("intro").value.trim();
-  const hoofdtekst = document.getElementById("hoofdtekst").value.trim();
+  const { titel, intro, hoofdtekst } = huidigeOnderdelen();
   const taak = document.getElementById("taak").value;
 
   const taakTekst = {
@@ -928,9 +867,7 @@ function ontleedAiOutput(tekst) {
 }
 
 function vergelijk() {
-  const titel = document.getElementById("titel").value;
-  const intro = document.getElementById("intro").value;
-  const hoofdtekst = document.getElementById("hoofdtekst").value;
+  const { titel, intro, hoofdtekst } = huidigeOnderdelen();
   const aiOutput = document.getElementById("ai-output").value;
 
   const ontleed = ontleedAiOutput(aiOutput);
