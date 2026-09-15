@@ -85,6 +85,26 @@
   button.uit, button.uit:hover { background: #eee; color: #8a8a8a; cursor: not-allowed; border: 1px solid var(--rand); }
   .knoppenrij { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 12px; }
   .toelichting { font-size: 0.8rem; color: #5c5c5c; margin-top: 6px; }
+  .herken-melding {
+    background: var(--blauw-licht);
+    color: var(--blauw-donker);
+    border-radius: var(--radius);
+    padding: 7px 10px;
+    font-size: 0.82rem;
+    margin-top: 6px;
+  }
+  .link-knop {
+    background: none;
+    border: none;
+    color: var(--blauw-donker);
+    text-decoration: underline;
+    padding: 0;
+    font-weight: 600;
+    font-size: inherit;
+    cursor: pointer;
+    margin-left: 4px;
+  }
+  .link-knop:hover { background: none; color: var(--blauw); }
   .resultaten { margin-top: 14px; }
   .telling { font-size: 0.82rem; color: #5c5c5c; margin-bottom: 8px; }
   .groepskop { font-weight: 700; margin: 16px 0 6px; font-size: 0.85rem; }
@@ -170,8 +190,12 @@
 <textarea id="intro" rows="3" placeholder="Korte introductietekst..."></textarea>
 
 <label for="hoofdtekst">Hoofdtekst</label>
-<div class="hint">Tussenkop? Begin de regel met <code>##</code>.</div>
-<textarea id="hoofdtekst" rows="12" placeholder="Plak of typ hier de conceptletekst..."></textarea>
+<div class="hint">Tip: plak hier gerust de hele pagina in 1 keer (titel + introductie + tekst) — bij lege Titel/Introductie wordt dat automatisch verdeeld. Tussenkop? Begin de regel met <code>##</code>.</div>
+<textarea id="hoofdtekst" rows="12" placeholder="Plak of typ hier de conceptletekst..." onpaste="verwerkPlakInHoofdtekst()"></textarea>
+<div class="herken-melding" id="herken-melding" hidden>
+  Titel en introductie automatisch herkend en ingevuld.
+  <button type="button" class="link-knop" onclick="ongedaanMakenHerkenning()">Ongedaan maken</button>
+</div>
 
 <div class="knoppenrij">
   <button onclick="controleer()">Controleer</button>
@@ -554,6 +578,89 @@ function renderIssues(issues, containerId) {
 
 function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+/* ==========================================================================
+   Titel/introductie herkennen als de redacteur alles in 1 keer in de
+   hoofdtekst plakt (bijv. de hele tekst van een live pagina). Bespaart het
+   apart moeten kopiëren van 3 losse stukjes tekst.
+
+   Met labels ("Titel"/"Introductie"/"Hoofdtekst" of "Tekst", elk op een
+   eigen regel) is de indeling expliciet — zelfde conventie als bij het
+   terugplakken van AI-output. Zonder labels geldt een simpele vuistregel:
+   de eerste regel is de titel, de 2e regel de introductie, de rest is de
+   hoofdtekst. Die vuistregel hoeft niet perfect te zijn: Controleer wijst
+   vanzelf op een titel die te lang is als de indeling een keer misgaat.
+   ========================================================================== */
+const INVOER_LABELS = ["titel", "introductie", "hoofdtekst", "tekst"];
+
+function herkenTitelIntroUitTekst(tekst) {
+  const regels = (tekst || "").split("\n");
+  const labelRegex = new RegExp(`^(${INVOER_LABELS.join("|")})\\s*:?\\s*$`, "i");
+
+  const labels = [];
+  regels.forEach((regel, index) => {
+    const m = regel.trim().match(labelRegex);
+    if (m) {
+      const naam = m[1].toLowerCase() === "tekst" ? "hoofdtekst" : m[1].toLowerCase();
+      labels.push({ naam, index });
+    }
+  });
+
+  if (labels.length > 0) {
+    const secties = {};
+    labels.forEach((label, i) => {
+      const eind = i + 1 < labels.length ? labels[i + 1].index : regels.length;
+      secties[label.naam] = regels.slice(label.index + 1, eind).join("\n").trim();
+    });
+    return { titel: secties.titel || "", intro: secties.introductie || "", hoofdtekst: secties.hoofdtekst || "" };
+  }
+
+  // Geen labels: vuistregel op basis van regelvolgorde.
+  const nietLegeRegels = [];
+  regels.forEach((regel, index) => { if (regel.trim() !== "") nietLegeRegels.push(index); });
+  if (nietLegeRegels.length === 0) return { titel: "", intro: "", hoofdtekst: "" };
+
+  const titelIndex = nietLegeRegels[0];
+  const introIndex = nietLegeRegels.length > 1 ? nietLegeRegels[1] : null;
+  const titel = regels[titelIndex].trim();
+  const intro = introIndex !== null ? regels[introIndex].trim() : "";
+  const hoofdtekstVanaf = introIndex !== null ? introIndex + 1 : titelIndex + 1;
+  const hoofdtekst = regels.slice(hoofdtekstVanaf).join("\n").trim();
+
+  return { titel, intro, hoofdtekst };
+}
+
+let ONGEDAAN_MAKEN_HOOFDTEKST = null;
+
+function verwerkPlakInHoofdtekst() {
+  const titelVeld = document.getElementById("titel");
+  const introVeld = document.getElementById("intro");
+  // Bestaande titel/introductie nooit overschrijven.
+  if (titelVeld.value.trim() || introVeld.value.trim()) return;
+
+  // setTimeout: wacht tot de geplakte tekst echt in het veld staat.
+  setTimeout(() => {
+    const hoofdtekstVeld = document.getElementById("hoofdtekst");
+    const geplakt = hoofdtekstVeld.value;
+    const herkend = herkenTitelIntroUitTekst(geplakt);
+    if (!herkend.titel || (!herkend.intro && !herkend.hoofdtekst)) return; // te weinig te verdelen
+
+    ONGEDAAN_MAKEN_HOOFDTEKST = geplakt;
+    titelVeld.value = herkend.titel;
+    introVeld.value = herkend.intro;
+    hoofdtekstVeld.value = herkend.hoofdtekst;
+    document.getElementById("herken-melding").hidden = false;
+  }, 0);
+}
+
+function ongedaanMakenHerkenning() {
+  if (ONGEDAAN_MAKEN_HOOFDTEKST === null) return;
+  document.getElementById("titel").value = "";
+  document.getElementById("intro").value = "";
+  document.getElementById("hoofdtekst").value = ONGEDAAN_MAKEN_HOOFDTEKST;
+  document.getElementById("herken-melding").hidden = true;
+  ONGEDAAN_MAKEN_HOOFDTEKST = null;
 }
 
 function controleer() {
