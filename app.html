@@ -75,11 +75,13 @@
 <p>Beveiligde versie: de regelset staat in Supabase en is alleen te lezen door vooraf toegestane accounts.</p>
 
 <div class="disclaimer">
-  <strong>Wat deze pagina wel en niet beschermt.</strong> Deze HTML en JavaScript zijn publiek — wie het bestand
-  kan opvragen, kan de code lezen. De bescherming zit op twee plekken daarbuiten:
-  <strong>Cloudflare Access</strong> staat vóór de bestanden en bepaalt wie de pagina überhaupt krijgt, en de
-  <strong>RLS-policies in Supabase</strong> staan vóór de gegevens en bepalen wie de regelset mag lezen.
+  <strong>Wat deze pagina wel en niet beschermt.</strong> Deze pagina is <strong>publiek</strong>: hij staat op
+  GitHub Pages, en wie de URL heeft kan hem openen en de JavaScript lezen. Dat hoort zo — er staat geen geheim in.
+  De bescherming zit in de <strong>RLS-policies in Supabase</strong>: die staan vóór de gegevens en bepalen wie de
+  regelset mag lezen. Zonder een toegestaan account komt er niets terug, langs welke weg je het ook probeert.
   Het inlogformulier hieronder is de bediening daarvan, niet de beveiliging zelf.
+  Mag ook de pagina zelf niet te openen zijn, dan is daar een extra laag vóór de bestanden voor nodig
+  (bijvoorbeeld Cloudflare Access) — GitHub Pages kan dat niet.
   De regelset in dit project is <strong>fictief</strong>, niet de officiële NWW-schrijfwijzer.
 </div>
 

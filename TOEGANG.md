@@ -60,10 +60,9 @@ roept die functie aan, en hij geeft alleen een ja/nee over de aanroeper terug.
 
 | Stap | Door wie |
 |---|---|
-| B1. Cloudflare Pages koppelen aan de repo | **jij** |
+| GitHub Pages aanzetten (deel B) | **jij** — twee klikken |
 | Testronde in de browser (deel C) | **jij** |
-| B2. Cloudflare Access ervoor zetten | **jij** |
-| Repo op private zetten (optioneel, voor "hele site privé") | **jij** |
+| Cloudflare Access ervoor zetten (deel D) | later, optioneel |
 
 
 ---
@@ -130,76 +129,85 @@ uit en de e-mailinstellingen van het project blijven ongewijzigd.
 
 ---
 
-## Deel B — Cloudflare (ongeveer 15 minuten)
+## Deel B — De app online zetten met GitHub Pages
 
-Dit is de laag die GitHub Pages niet kan leveren: iets dat vóór de bestanden staat.
+We doen bewust eerst alleen deze laag, zodat je de toegangscontrole op de gegevens
+los kunt testen. Let op wat dit wel en niet is:
 
-### B1. De site publiceren op Cloudflare Pages
-1. Maak een gratis account op [dash.cloudflare.com](https://dash.cloudflare.com).
-2. **Workers & Pages** → **Create** → tab **Pages** → **Connect to Git**.
-3. Autoriseer GitHub en kies `NWW-team/Redactiehulp`.
-4. Build-instellingen:
-   - Framework preset: **None**
-   - Build command: **leeg laten**
-   - Build output directory: `/`
-5. **Save and Deploy**. Je krijgt een adres als `redactiehulp.pages.dev`.
+- **Wel:** de regelset is afgeschermd. Zonder toegestaan account krijg je niets,
+  langs welke weg dan ook.
+- **Niet:** de pagina zelf is openbaar. Iedereen met de URL kan `app.html` openen en
+  de JavaScript lezen. Daar staat geen geheim in, dus dat is geen lek — maar het is
+  ook geen "hele site privé". Daarvoor is deel D nodig.
 
-Op dit moment is die URL nog **openbaar**. Stap B2 sluit hem af.
+1. Open **https://github.com/NWW-team/Redactiehulp/settings/pages**
+2. Bij **Source** kies je **Deploy from a branch**.
+3. Bij **Branch** kies je `claude/app-datastromen-diagram-ql0vjv` en map `/ (root)` → **Save**.
+   (Wil je liever vanaf `main` publiceren, merge die branch dan eerst.)
+4. Wacht één tot twee minuten. Bovenaan dezelfde pagina verschijnt de URL, meestal
+   `https://nww-team.github.io/Redactiehulp/`.
 
-### B2. Access ervoor zetten
-1. In hetzelfde dashboard: **Zero Trust**. De eerste keer kies je een teamnaam en het
-   **Free** plan (tot 50 gebruikers).
-2. **Access** → **Applications** → **Add an application** → **Self-hosted**.
-3. Application name: `Redactiehulp`. Als domein kies je je Pages-project of vul je
-   `redactiehulp.pages.dev` in.
-4. Identity provider: laat **One-time PIN** aan staan. Dan is er geen koppeling met een
-   ander inlogsysteem nodig — bezoekers krijgen een code per mail.
-5. Voeg een policy toe:
-   - Name: `Alleen testers`
-   - Action: **Allow**
-   - Include → **Emails** → de adressen die binnen mogen (jouw eigen adres en dat van je
-     testers). Let op: dit zijn **echte** mailboxen, want de code moet aankomen —
-     `example.com` werkt hier dus niet.
-6. Opslaan. Zet dezelfde bescherming ook op **preview deployments**, anders is elke
-   branch-preview publiek.
-
-> Accepteert Cloudflare de `pages.dev`-hostnaam niet in de Access-applicatie, dan heb je
-> een eigen domein in Cloudflare nodig. Dat kon ik vanaf hier niet uitproberen — laat het
-> weten en ik pas de instructie aan.
-
-### B3. Site URL in Supabase bijwerken (optioneel)
-**Authentication** → **URL Configuration** → **Site URL** → je `pages.dev`-adres.
-Voor inloggen met wachtwoord is dit niet nodig; het is wel nodig zodra je ooit
-magic links of wachtwoordherstel gebruikt.
+De beschermde app staat dan op **`https://nww-team.github.io/Redactiehulp/app.html`**.
+Op `/` staat nog steeds de open demo `index.html` met de placeholderregels — die is
+bewust ongewijzigd gebleven.
 
 ---
 
 ## Deel C — Testen
 
-Doe dit in een **privévenster**, zodat er geen oude sessie meespeelt.
+Doe dit in een **privévenster**, zodat er geen oude sessie meespeelt. Gebruik de twee
+accounts die in het Supabase-dashboard zijn aangemaakt.
 
 | # | Test | Verwacht |
 |---|---|---|
-| 1 | Open de `pages.dev`-URL zonder Access-sessie | Cloudflare vraagt om je e-mail + pincode. Je ziet de app niet. |
-| 2 | Door Access heen, nog niet ingelogd in de app | Inlogscherm. Geen regelset, geen invoervelden. |
-| 3 | Inloggen met `toegestaan.redacteur@example.com` | App verschijnt, balk toont "6 regels geladen". "Controleer tekst" werkt. |
-| 4 | Uitloggen, inloggen met `geen.toegang@example.com` | Scherm "Geen toegang". Geen regels, ook niet kort. |
-| 5 | **Directe URL:** ga rechtstreeks naar `.../app.html` terwijl je uitgelogd bent | Inlogscherm. Er is geen URL die de app zonder sessie toont. |
-| 6 | **Direct gegevensverzoek (uitgelogd):** open het blok "Toegang zelf testen" en klik de knop | `status: 200` en `antwoord: []`. Een lege lijst is de policy die werkt — geen storing. |
-| 7 | Zelfde verzoek als account 2 | Ook `[]`. Ingelogd zijn is niet genoeg; je moet op de allowlist staan. |
-| 8 | Zelfde verzoek als account 1 | Een lijst met de zes regels. |
-| 9 | **Na uitloggen opnieuw proberen:** log uit, klik nogmaals op de knop | Weer `[]`. Vernieuw de pagina: inlogscherm, invoervelden leeg. |
+| 1 | Open `.../app.html`, nog niet ingelogd | Inlogscherm. Geen regelset, geen invoervelden. |
+| 2 | Klap "Toegang zelf testen" open en klik de knop | `status: 200` en `antwoord: []` |
+| 3 | Log in met `toegestaan.redacteur@example.com` | App verschijnt, balk toont "6 regels geladen". "Controleer tekst" werkt. |
+| 4 | Klik nu nogmaals op de testknop | Een lijst met de zes regels |
+| 5 | Uitloggen, inloggen met `geen.toegang@example.com` | Scherm **"Geen toegang"**. Geen regels, ook niet kort zichtbaar. |
+| 6 | Testknop bij dat account | Weer `[]` — ingelogd zijn is niet genoeg |
+| 7 | Uitloggen, pagina verversen | Inlogscherm, invoervelden leeg |
+| 8 | **Directe URL:** ga uitgelogd rechtstreeks naar `.../app.html` | Inlogscherm. Er is geen URL die de app zonder sessie toont. |
 
-### Test 6 en 9 ook buiten de app om
-Plak dit in de adresbalk van een privévenster (vul je eigen projectref en anon key in).
-Zo omzeil je de pagina volledig en praat je rechtstreeks met de database:
+### Test 2 en 6 ook buiten de app om
+
+Plak dit in de adresbalk van een privévenster. Zo omzeil je de pagina volledig en praat
+je rechtstreeks met de database:
 
 ```
-https://<projectref>.supabase.co/rest/v1/schrijfwijzer_regel?select=*&apikey=<anon-key>
+https://wmqketplyfscvcxxpnmb.supabase.co/rest/v1/schrijfwijzer_regel?select=*&apikey=sb_publishable_pCH-CbkAUydS3lw_u4eH7g_KUx_L3Gz
 ```
 
-Verwacht: `[]`. Krijg je wél regels te zien zonder ingelogd te zijn, dan staat RLS niet
-aan — stop en controleer stap A3.
+Verwacht: `[]`. Zie je wél regels zonder ingelogd te zijn, stop dan — dan klopt er iets
+niet aan de policies.
+
+### Wat je ook nog kunt proberen
+
+- Maak in het Supabase-dashboard een gebruiker aan met een willekeurig ander adres.
+  Dat hoort te mislukken met een databasefout: de trigger
+  `beperk_registratie_tot_allowlist` weigert het.
+- Zet `actief` van `geen.toegang@example.com` op `true` in de Table Editor en log opnieuw
+  in. Dat account krijgt dan wél de regelset. Zet hem daarna weer op `false`.
+
+---
+
+## Deel D — Later: de site zelf afsluiten (optioneel)
+
+Pas zinvol als je ook de HTML zelf privé wilt. GitHub Pages kan dat niet; er moet iets
+vóór de bestanden staan. De route:
+
+1. Cloudflare-account → **Workers & Pages → Create → Pages → Connect to Git** →
+   `NWW-team/Redactiehulp`, build command leeg, output directory `/`.
+2. **Zero Trust → Access → Applications → Add an application → Self-hosted**, domein =
+   je `pages.dev`-adres, identity provider **One-time PIN**.
+3. Policy: **Allow**, Include → **Emails** → echte mailadressen van je testers.
+4. Zet dezelfde bescherming op preview deployments.
+5. Wil je ook de broncode privé, zet de repo dan op **Private**
+   (GitHub → Settings → General → onderaan → Change visibility). Cloudflare Pages werkt
+   met een private repo; GitHub Pages op een gratis plan niet.
+
+Dat levert twee inlogmomenten op: eerst Cloudflare, dan de app. Dat is geen dubbelop —
+Cloudflare bepaalt wie de bestanden krijgt, Supabase bepaalt wie de gegevens krijgt.
 
 ---
 
@@ -207,8 +215,7 @@ aan — stop en controleer stap A3.
 
 - De **échte schrijfwijzer** zit nog niet in de database. Laad die pas als de tests
   hierboven slagen, via **Table Editor** of een `insert`-query in de SQL Editor.
-- `index.html` blijft de onbeschermde demo met de placeholderregels. Wil je die
-  weghalen of achter Access zetten, zeg het dan.
+- `index.html` blijft de onbeschermde demo met de placeholderregels.
 - De Supabase-bibliotheek komt van een CDN (`@supabase/supabase-js@2`, niet vastgepind).
   Voor een strengere opzet zet je een eigen kopie in de repo of pin je een versie met
   een integriteitshash.
