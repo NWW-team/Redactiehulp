@@ -29,6 +29,23 @@ Open `index.html` gewoon in een browser (dubbelklikken, of via een GitHub Pages-
 
 `herkenTitelIntroUitTekst()` splitst het ene tekstveld: met labels ("Titel"/"Introductie"/"Hoofdtekst" of "Tekst", elk op een eigen regel) is de indeling expliciet; zonder labels geldt de vuistregel "1e regel = titel, 2e regel = introductie, de rest is hoofdtekst". Die vuistregel hoeft niet perfect te zijn — Controleer wijst vanzelf op een titel die te lang is als de indeling een keer misgaat.
 
+## Beveiligde versie (app.html)
+
+Naast de open demo `index.html` staat er een afgeschermde versie: `app.html`. Daar staat de
+regelset niet in het bestand maar in Supabase, achter RLS-policies, en komt hij pas binnen na
+inloggen met een vooraf toegestaan account. De bijbehorende SQL staat in `supabase/`; de
+stap-voor-stap-instructies voor Supabase en Cloudflare, plus het testscript, staan in
+[`TOEGANG.md`](TOEGANG.md).
+
+De regelset in `app.html` komt uit de database, niet uit het bestand: de echte schrijfwijzer
+staat in Supabase achter RLS en is daarom bewust niet in deze openbare repo te vinden.
+`supabase/regeltypen.md` beschrijft alleen de structuur.
+
+Twee dingen om niet te verwarren: `app.html` en de JavaScript erin zijn gewoon publieke
+frontendbestanden — de bescherming zit in Cloudflare Access (vóór de bestanden) en in de
+RLS-policies (vóór de gegevens). In `supabase-config.js` hoort alleen de project-URL en de
+anon/publishable key; nooit een service-role key, secret key of databasewachtwoord.
+
 ## Regelset aanpassen
 
 Pas het `RULES`-blok bovenaan het `<script>`-gedeelte van `index.html` aan. Elke regel is een object met `id`, `titel`, `categorie`, `bron`, `scope` (`titel`, `intro` of `tekst`), `autoFixable` (kan de app dit zelf oplossen in stap 2?) en een `check(waarde)`-functie die een lijst gevonden aandachtspunten teruggeeft.
